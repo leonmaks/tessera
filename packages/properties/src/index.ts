@@ -1,17 +1,18 @@
+import { InvalidPropertyValueError } from "@logseq-ts/domain";
 import type { PropertyType, PropertyValue, UUID } from "@logseq-ts/domain";
-
-export interface PropertyDefinition {
-  readonly uuid: UUID;
-  readonly name: string;
-  readonly type: PropertyType;
-  readonly cardinality: "one" | "many";
-  readonly allowedTags?: readonly UUID[];
-  readonly hidden?: boolean;
-}
-
-export interface PropertyService {
-  create(definition: Omit<PropertyDefinition, "uuid">): Promise<PropertyDefinition>;
-  set(entity: UUID, property: UUID, value: PropertyValue | readonly PropertyValue[]): Promise<void>;
-  remove(entity: UUID, property: UUID): Promise<void>;
-  effectiveDefinitions(entity: UUID): Promise<readonly PropertyDefinition[]>;
-}
+export interface PropertyDefinition { readonly uuid: UUID; readonly name: string; readonly type: PropertyType; readonly cardinality: "one" | "many"; readonly allowedTags?: readonly UUID[]; readonly hidden?: boolean; }
+export interface PropertyService { create(definition: Omit<PropertyDefinition, "uuid">): Promise<PropertyDefinition>; set(entity: string, property: UUID, value: PropertyValue | readonly PropertyValue[]): Promise<void>; remove(entity: string, property: UUID): Promise<void>; values(entity: string, property: UUID): Promise<readonly PropertyValue[]>; defineClass(name: string, properties?: readonly UUID[]): Promise<void>; extendClass(child: string, parent: string): Promise<void>; assignClass(entity: string, name: string): Promise<void>; parentsOf(name: string): Promise<readonly string[]>; effectiveDefinitions(entity: string): Promise<readonly PropertyDefinition[]>; }
+class Service implements PropertyService { private readonly definitions = new Map<UUID, PropertyDefinition>(); private readonly assigned = new Map<string, Map<UUID, readonly PropertyValue[]>>(); private readonly classes = new Map<string, { properties: Set<UUID>; parents: Set<string> }>(); private readonly entityClasses = new Map<string, Set<string>>(); constructor(private readonly uuid: { next(): string }) {}
+ async create(definition: Omit<PropertyDefinition, "uuid">): Promise<PropertyDefinition> { const value = freeze({ ...definition, uuid: this.uuid.next() as UUID }); if ([...this.definitions.values()].some(existing => existing.name === value.name)) throw new Error(`Property exists: ${value.name}`); this.definitions.set(value.uuid, value); return value; }
+ async set(entity: string, property: UUID, value: PropertyValue | readonly PropertyValue[]): Promise<void> { const definition = this.definitions.get(property); if (!definition) throw new Error("Unknown property"); const values = Array.isArray(value) ? value : [value]; if (!values.every(item => valid(definition.type, item))) throw new InvalidPropertyValueError(`Invalid value for ${definition.name}`); if (definition.cardinality === "one" && values.length !== 1) throw new InvalidPropertyValueError("Cardinality one requires one value"); const bag = this.assigned.get(entity) ?? new Map(); bag.set(property, freeze([...new Map(values.map(item => [JSON.stringify(item), item])).values()])); this.assigned.set(entity, bag); }
+ async remove(entity: string, property: UUID): Promise<void> { this.assigned.get(entity)?.delete(property); }
+ async values(entity: string, property: UUID): Promise<readonly PropertyValue[]> { return freeze([...(this.assigned.get(entity)?.get(property) ?? [])]); }
+ async defineClass(name: string, properties: readonly UUID[] = []): Promise<void> { if (this.classes.has(name)) throw new Error(`Class exists: ${name}`); for (const property of properties) if (!this.definitions.has(property)) throw new Error("Unknown property"); this.classes.set(name, { properties: new Set(properties), parents: new Set() }); }
+ async extendClass(child: string, parent: string): Promise<void> { const childNode = this.class(child), parentNode = this.class(parent); if (child === parent || this.reaches(parent, child)) throw new Error("Class inheritance cycle"); childNode.parents.add(parent); }
+ async assignClass(entity: string, name: string): Promise<void> { this.class(name); (this.entityClasses.get(entity) ?? this.newClasses(entity)).add(name); }
+ async parentsOf(name: string): Promise<readonly string[]> { return freeze([...this.class(name).parents].sort()); }
+ async effectiveDefinitions(entity: string): Promise<readonly PropertyDefinition[]> { const names = this.entityClasses.get(entity) ?? new Set(); const ids = new Set<UUID>(); const visit = (name: string) => { const item = this.class(name); item.properties.forEach(id => ids.add(id)); item.parents.forEach(visit); }; names.forEach(visit); return freeze([...ids].map(id => this.definitions.get(id)!).sort((a,b) => a.name.localeCompare(b.name))); }
+ private class(name: string) { const value = this.classes.get(name); if (!value) throw new Error(`Unknown class: ${name}`); return value; } private newClasses(entity: string) { const value = new Set<string>(); this.entityClasses.set(entity, value); return value; } private reaches(from: string, target: string): boolean { if (from === target) return true; return [...this.class(from).parents].some(parent => this.reaches(parent, target)); } }
+function valid(type: PropertyType, value: PropertyValue): boolean { return value.type === type || (type === "datetime" && value.type === "date"); }
+function freeze<T>(value: T): T { if (value && typeof value === "object" && !Object.isFrozen(value)) { for (const child of Object.values(value as Record<string, unknown>)) freeze(child); Object.freeze(value); } return value; }
+export function createPropertyService(options: { readonly uuid: { next(): string } }): PropertyService { return new Service(options.uuid); }

@@ -35,3 +35,7 @@ Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346
 ## Phase 03 parser evidence
 
 Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346e4d247a0783738`, status `PINNED`. The pinned upstream syntax documentation is listed by the baseline as `docs/logseq-markdown-syntax.md`; it establishes the compatibility surface, while the implementation is independently scanner-based and does not copy upstream code. `tests/fixtures/parity/parser/page-and-code.scenario.json` checks a semantic page ref against an excluded code literal through the parser candidate and an explicit test double. Pinned executable upstream parser adapter: **UNAVAILABLE**; report `compatible: false`, so no L2 claim is made.
+
+## Phase 04 property/task evidence
+
+Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346e4d247a0783738`, status `PINNED`. The baseline names the upstream DB properties guide as evidence; no runnable adapter is present. `tests/fixtures/parity/properties/typed-number.scenario.json` exercises the candidate through an explicit test double, reports `compatible: false`, and makes no L3 claim.

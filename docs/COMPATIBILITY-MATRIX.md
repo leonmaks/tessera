@@ -31,3 +31,7 @@ L1 candidate corpus: seven executable outliner BDD scenarios, four focused seman
 ## Phase 03 status
 
 L2 candidate corpus: three parser/reference BDD scenarios, four parser/reference contracts, one 100-run code-isolation property check, and one parser fixture. Its reference is an explicit test double; no runnable pinned upstream parser adapter is available and no L2 compatibility is claimed.
+
+## Phase 04 status
+
+L3 candidate corpus: three properties BDD scenarios, typed-property/class/task/journal contracts, and a typed-number fixture with explicit test-double provenance. No executable pinned upstream adapter is available; no L3 compatibility is claimed.

@@ -1,0 +1,1 @@
+{"id":"properties-typed-number","description":"Typed number property remains numeric","commands":[{"op":"setProperty","target":"entity","property":"rating","value":5}]}

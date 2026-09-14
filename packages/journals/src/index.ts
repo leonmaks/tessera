@@ -1,0 +1,3 @@
+export interface Journal { readonly uuid: string; readonly date: string; readonly display: string; }
+export interface JournalService { get(date: string, display: string): Journal; }
+export function createJournalService(uuid: { next(): string }): JournalService { const journals = new Map<string, Journal>(); return { get(date, display) { if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("Journal date must be ISO YYYY-MM-DD"); const current = journals.get(date); if (current) return current; const journal = Object.freeze({ uuid: uuid.next(), date, display }); journals.set(date, journal); return journal; } }; }
