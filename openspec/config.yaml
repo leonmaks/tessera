@@ -1,0 +1,39 @@
+schema: spec-driven
+
+context: |
+  Product: TypeScript behavioral reimplementation of current Logseq DB-first behavior.
+  Language: specifications and design notes may be written in Russian; identifiers and source code use English.
+  Runtime: Node.js >=22.20.0, TypeScript 5.9 strict ESM, pnpm.
+  Architecture: the graph worker is the sole mutable graph authority. UI/CLI/plugins/sync use semantic commands.
+  Persistence: SQLite is authoritative local persistence; search/client-op stores are rebuildable.
+  Identity: UUID is public identity; numeric SQLite ids are internal.
+  UI: React renderer consumes immutable snapshots and revision-aware render deltas.
+  Testing: Gherkin/Cucumber for BDD, Vitest for TDD, fast-check for invariants, Playwright for UI, differential tests against a pinned Logseq baseline.
+  Compatibility: preserve observable Logseq behavior, query semantics, import/export semantics, plugin-facing contracts, and sync ordering. Do not transliterate upstream source.
+  Legal/clean-room: source may be studied to specify behavior, but implementation must be independently authored.
+
+rules:
+  proposal:
+    - State which compatibility level(s) are affected.
+    - Identify upstream evidence and parity fixtures required.
+    - State migration and rollback impact for persistence/protocol changes.
+  specs:
+    - Describe observable behavior, inputs, outputs, errors, and constraints.
+    - Use Given/When/Then scenarios for every normative behavior.
+    - Distinguish DB-graph behavior from legacy file-graph compatibility when relevant.
+  design:
+    - Include dependency direction and authority boundaries.
+    - Include transaction sequence for any mutation path.
+    - Include failure behavior and stale/retry semantics for distributed or revisioned flows.
+  tasks:
+    - Order work BDD -> failing TDD/property test -> implementation -> parity -> full verification.
+    - Every task must name the exact verification command.
+
+operations:
+  apply:
+    guidance:
+      - Never bypass a failing compatibility test with a hardcoded fixture-only path.
+      - Run the narrowest tests after each red/green cycle, then run pnpm verify before completion.
+  archive:
+    guidance:
+      - Archive only after parity evidence and regression fixtures are committed.

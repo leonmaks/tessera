@@ -1,0 +1,37 @@
+# Render Subscriptions Specification
+
+## Purpose
+
+Define the worker-to-renderer incremental state contract.
+
+## Requirements
+
+### Requirement: Delta is derived from committed transaction
+The worker SHALL produce renderer deltas only from committed graph state.
+
+#### Scenario: Failed command
+- **WHEN** a graph command fails validation
+- **THEN** no graph render delta SHALL be published for that command
+
+### Requirement: Delta is revisioned
+Each delta SHALL include graph identity and authoritative revision.
+
+#### Scenario: Old delta arrives late
+- **GIVEN** renderer is at revision 12
+- **WHEN** delta revision 11 arrives
+- **THEN** the renderer SHALL ignore it
+
+### Requirement: Blocks are complete replacements
+Changed blocks in a render delta SHALL be complete immutable replacements for the subscribed block projection, not partial mutable objects.
+
+### Requirement: Deletions are tombstones
+Deleted blocks SHALL be represented explicitly so caches can remove them.
+
+### Requirement: Child membership patch is base-revision aware
+A child patch SHALL declare the base revision it expects.
+
+#### Scenario: Stale child patch
+- **GIVEN** mounted children cache cannot reconcile the patch base revision
+- **WHEN** the patch arrives
+- **THEN** that children resource SHALL be marked stale and reloaded
+- **AND** the patch SHALL NOT be speculatively merged

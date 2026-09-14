@@ -1,0 +1,7 @@
+{
+  "graphLabel": "harness-contract",
+  "nodes": [
+    { "uuid": "00000000-0000-4000-8000-000000000002", "kind": "block", "content": "Keep [[reference]]", "parentUuid": "00000000-0000-4000-8000-000000000001", "pageUuid": "00000000-0000-4000-8000-000000000001", "orderKey": "a0", "tags": ["b", "a"], "refs": ["y", "x"], "properties": { "typed": { "type": "number", "value": 3 }, "list": [2, 1] } },
+    { "uuid": "00000000-0000-4000-8000-000000000001", "kind": "page", "content": "Page", "tags": [], "refs": [], "properties": {} }
+  ]
+}

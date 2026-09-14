@@ -1,0 +1,40 @@
+{
+  "name": "logseq-ts-parity",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.20.0"
+  },
+  "scripts": {
+    "bootstrap": "node scripts/bootstrap.mjs",
+    "openspec:init": "openspec init . --tools codex",
+    "openspec:update": "openspec update",
+    "openspec:validate": "openspec validate --all",
+    "baseline:pin": "node scripts/pin-logseq-baseline.mjs",
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "check:specs": "node scripts/check-specs.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:property": "vitest run tests/property",
+    "test:parity": "vitest run tests/parity",
+    "test:bdd": "node --import tsx ./node_modules/@cucumber/cucumber/bin/cucumber.js --config cucumber.mjs",
+    "test:e2e": "playwright test",
+    "verify": "pnpm check:boundaries && pnpm check:specs && pnpm typecheck && pnpm test",
+    "codex:next": "node scripts/next-phase.mjs"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "13.2.1",
+    "@fission-ai/openspec": "1.13.0",
+    "@playwright/test": "1.58.2",
+    "@types/node": "22.20.2",
+    "fast-check": "4.10.0",
+    "tsx": "4.23.13",
+    "typescript": "5.9.3",
+    "vite": "8.0.10",
+    "vitest": "5.0.0",
+    "zod": "4.6.2"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/logseq/logseq.git",
+  "branch": "master",
+  "commit": "be800f171172c259d4dd942346e4d247a0783738",
+  "resolvedAt": "2026-09-13T21:02:07.960Z",
+  "status": "PINNED",
+  "referenceDocs": [
+    "https://github.com/logseq/logseq/blob/master/docs/agent-guide/implemented/architecture/2026-08-24-logseq-runtime-and-engineering-guide.md",
+    "https://github.com/logseq/logseq/blob/master/libs/src/LSPlugin.ts",
+    "https://github.com/logseq/logseq/blob/master/libs/guides/db_query_guide.md",
+    "https://github.com/logseq/logseq/blob/master/libs/guides/db_properties_guide.md",
+    "https://github.com/logseq/logseq/blob/master/docs/logseq-markdown-syntax.md"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "outliner-insert-after",
+  "description": "Insert B after A before C",
+  "commands": [
+    {
+      "op": "createPage",
+      "name": "P",
+      "as": "page"
+    },
+    {
+      "op": "insertBlock",
+      "target": "$page",
+      "position": "last-child",
+      "content": "A",
+      "as": "A"
+    },
+    {
+      "op": "insertBlock",
+      "target": "$page",
+      "position": "last-child",
+      "content": "C",
+      "as": "C"
+    },
+    {
+      "op": "insertBlock",
+      "target": "$A",
+      "position": "after",
+      "content": "B",
+      "as": "B"
+    }
+  ]
+}
