@@ -1,0 +1,1 @@
+{"id":"query-task-status","description":"Simple task query filters statuses","commands":[{"op":"setProperty","target":"task","property":"status","value":"TODO"}]}

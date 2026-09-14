@@ -39,3 +39,7 @@ Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346
 ## Phase 04 property/task evidence
 
 Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346e4d247a0783738`, status `PINNED`. The baseline names the upstream DB properties guide as evidence; no runnable adapter is present. `tests/fixtures/parity/properties/typed-number.scenario.json` exercises the candidate through an explicit test double, reports `compatible: false`, and makes no L3 claim.
+
+## Phase 05 query evidence
+
+Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346e4d247a0783738`, status `PINNED`. The baseline names the DB query guide but no runnable pinned query adapter is available. `tests/fixtures/parity/query/task-status.scenario.json` uses an explicit test double and reports `compatible: false`; no L4 claim is made.

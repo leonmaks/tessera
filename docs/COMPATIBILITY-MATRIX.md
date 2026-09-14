@@ -35,3 +35,7 @@ L2 candidate corpus: three parser/reference BDD scenarios, four parser/reference
 ## Phase 04 status
 
 L3 candidate corpus: three properties BDD scenarios, typed-property/class/task/journal contracts, and a typed-number fixture with explicit test-double provenance. No executable pinned upstream adapter is available; no L3 compatibility is claimed.
+
+## Phase 05 status
+
+L4 candidate corpus: Datalog/simple-query/pull contracts, two BDD scenarios and one task-status fixture. The fixture uses an explicit test double; no pinned upstream executable query adapter exists and no L4 compatibility is claimed.

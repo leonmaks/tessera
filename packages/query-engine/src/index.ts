@@ -1,11 +1,16 @@
-export interface QueryEngine {
-  simple<T = unknown>(dsl: string): Promise<T>;
-  datalog<T = unknown>(query: string, ...inputs: readonly unknown[]): Promise<T>;
-  custom<T = unknown>(query: string, ...inputs: readonly unknown[]): Promise<T>;
-}
-
-export interface QueryLimits {
-  readonly timeoutMs: number;
-  readonly maxResults: number;
-  readonly maxIntermediateRows: number;
-}
+export interface Fact { readonly entity: string; readonly attribute: string; readonly value: unknown; }
+export interface QueryLimits { readonly timeoutMs: number; readonly maxResults: number; readonly maxIntermediateRows: number; }
+export interface QueryEngine { simple<T = unknown>(dsl: string): Promise<T>; datalog<T = unknown>(query: string, ...inputs: readonly unknown[]): Promise<T>; custom<T = unknown>(query: string, ...inputs: readonly unknown[]): Promise<T>; pull(entity: string, attributes: readonly string[]): Promise<Readonly<Record<string, readonly unknown[]>>>; }
+interface Datalog { readonly find: readonly string[]; readonly where: readonly [string, string, unknown][]; }
+export function createQueryEngine(options: { readonly facts: readonly Fact[]; readonly limits?: Partial<QueryLimits> }): QueryEngine { return new Engine(options.facts, { timeoutMs: 100, maxResults: 1000, maxIntermediateRows: 10000, ...options.limits }); }
+class Engine implements QueryEngine { constructor(private readonly facts: readonly Fact[], private readonly limits: QueryLimits) {}
+ async simple<T>(dsl: string): Promise<T> { const found = /^\(task\s+([^)]*)\)$/.exec(dsl.trim()); if (!found) throw new Error("Unsupported simple query"); const statuses = new Set(found[1]!.trim().split(/\s+/).filter(Boolean)); return this.limit(this.facts.filter(fact => fact.attribute === ":task/status" && typeof fact.value === "string" && statuses.has(fact.value)).map(fact => fact.entity).sort()) as T; }
+ async datalog<T>(query: string, ...inputs: readonly unknown[]): Promise<T> { let parsed: Datalog; try { parsed = JSON.parse(query) as Datalog; } catch { throw new Error("Unsupported Datalog syntax"); } if (!Array.isArray(parsed.find) || !Array.isArray(parsed.where)) throw new Error("Invalid Datalog query"); let rows: Map<string, unknown>[] = [new Map()]; let steps = 0; for (const clause of parsed.where) { if (!Array.isArray(clause) || clause.length !== 3) throw new Error("Invalid Datalog clause"); const next: Map<string, unknown>[] = []; for (const row of rows) for (const fact of this.facts) { if (++steps > this.limits.maxIntermediateRows) throw new Error("QUERY_LIMIT intermediate rows"); const candidate = new Map(row); if (match(candidate, clause[0], fact.entity, inputs) && match(candidate, clause[1], fact.attribute, inputs) && match(candidate, clause[2], fact.value, inputs)) next.push(candidate); } rows = next; } return this.limit(rows.map(row => parsed.find.map(name => row.get(name))).sort(compare)) as T; }
+ async custom<T>(query: string, ...inputs: readonly unknown[]): Promise<T> { return this.datalog<T>(query, ...inputs); }
+ async pull(entity: string, attributes: readonly string[]): Promise<Readonly<Record<string, readonly unknown[]>>> { const output: Record<string, unknown[]> = {}; for (const fact of this.facts) if (fact.entity === entity && attributes.includes(fact.attribute)) (output[fact.attribute] ??= []).push(fact.value); for (const values of Object.values(output)) values.sort(compareValue); return freeze(output); }
+ private limit<T>(rows: readonly T[]): readonly T[] { if (rows.length > this.limits.maxResults) throw new Error("QUERY_LIMIT results"); return freeze([...rows]); } }
+function match(row: Map<string, unknown>, term: unknown, value: unknown, inputs: readonly unknown[]): boolean { if (typeof term === "string" && term.startsWith("?")) { const bound = row.get(term); if (bound === undefined) { row.set(term, value); return true; } return same(bound, value); } if (typeof term === "string" && term.startsWith("$")) return same(inputs[Number(term.slice(1))], value); return same(term, value); }
+function same(a: unknown, b: unknown): boolean { return JSON.stringify(a) === JSON.stringify(b); }
+function compare(a: readonly unknown[], b: readonly unknown[]): number { return JSON.stringify(a).localeCompare(JSON.stringify(b)); }
+function compareValue(a: unknown, b: unknown): number { return JSON.stringify(a).localeCompare(JSON.stringify(b)); }
+function freeze<T>(value: T): T { if (value && typeof value === "object" && !Object.isFrozen(value)) { for (const child of Object.values(value as Record<string, unknown>)) freeze(child); Object.freeze(value); } return value; }

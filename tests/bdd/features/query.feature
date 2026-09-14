@@ -7,6 +7,6 @@ Feature: Logseq-compatible queries
     Then normalized results contain only the "TODO" and "DOING" tasks
 
   Scenario: Parameterized Datalog query
-    Given page "Architecture" contains block "B"
+    Given query page "Architecture" contains block "B"
     When I execute the page-block Datalog query with input "architecture"
     Then normalized results contain block "B"
