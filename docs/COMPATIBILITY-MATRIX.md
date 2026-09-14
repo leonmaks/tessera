@@ -43,3 +43,7 @@ L4 candidate corpus: Datalog/simple-query/pull contracts, two BDD scenarios and 
 ## Phase 06 status
 
 Renderer-subscription candidate corpus: revision/stale-child/duplicate-publication contracts, two BDD scenarios, one 100-run revision-order property check, and a stale-child fixture. The reference is an explicit test double; no pinned executable worker adapter is available and no L5 compatibility is claimed.
+
+## Phase 07 status
+
+L5 candidate corpus: semantic editor-controller contracts, two BDD scenarios, two real Playwright browser scenarios, and an Enter-to-split fixture. The reference is an explicit test double; no pinned executable editor adapter is available and no L5 upstream compatibility is claimed.

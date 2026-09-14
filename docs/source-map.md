@@ -47,3 +47,7 @@ Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346
 ## Phase 06 renderer evidence
 
 Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346e4d247a0783738`, status `PINNED`. The baseline architecture guide identifies a worker-owned graph runtime, but no runnable pinned renderer adapter is present. `tests/fixtures/parity/render/stale-child-patch.scenario.json` exercises the independently authored revision-aware store through an explicit test double and reports `compatible: false`; no L5 claim is made.
+
+## Phase 07 editor evidence
+
+Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346e4d247a0783738`, status `PINNED`. No runnable upstream browser editor adapter is available. `tests/fixtures/parity/editor/enter-split.scenario.json` runs the independently authored semantic-intent controller against an explicit test double, reports `compatible: false`, and makes no L5 claim.

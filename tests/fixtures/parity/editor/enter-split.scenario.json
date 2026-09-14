@@ -1,0 +1,1 @@
+{"id":"editor-enter-split","description":"Enter normalizes to a semantic block split intent","commands":[{"op":"splitBlock","target":"block","offset":6}]}

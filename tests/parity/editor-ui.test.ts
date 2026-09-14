@@ -1,0 +1,11 @@
+import { readFileSync } from "node:fs";
+import { expect, it } from "vitest";
+import { runParity } from "../../packages/compatibility-oracle/src/index.js";
+import type { CompatibilityScenario, ParityProvider, ReferenceProvider } from "../../packages/compatibility-oracle/src/index.js";
+import { createEditorController } from "../../packages/editor-ui/src/index.js";
+import { baseline, sha } from "../support/harness.js";
+const scenario = JSON.parse(readFileSync(new URL("../fixtures/parity/editor/enter-split.scenario.json", import.meta.url), "utf8")) as CompatibilityScenario;
+const snapshot = { graphLabel: scenario.id, nodes: [{ uuid: "00000000-0000-4000-8000-000000000701", kind: "editor-intent", content: "split", tags: [], refs: [], properties: { block: "B", offset: 6 } }] };
+const candidate: ParityProvider = { name: "phase07-editor-candidate", async execute() { const intents: unknown[] = []; const editor = createEditorController({ send: intent => { intents.push(intent); } }); editor.focus("B", 6); editor.key("Enter"); return intents.length === 1 ? snapshot : { ...snapshot, nodes: [] }; } };
+const reference: ReferenceProvider = { name: "phase07-fixture-test-double", baselineCommit: sha, evidence: "test-double", async execute() { return snapshot; } };
+it("keeps Phase 07 editor provenance explicit", async () => { await expect(runParity(baseline, scenario, candidate, reference)).resolves.toMatchObject({ equal: true, compatible: false }); });
