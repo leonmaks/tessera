@@ -43,3 +43,7 @@ Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346
 ## Phase 05 query evidence
 
 Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346e4d247a0783738`, status `PINNED`. The baseline names the DB query guide but no runnable pinned query adapter is available. `tests/fixtures/parity/query/task-status.scenario.json` uses an explicit test double and reports `compatible: false`; no L4 claim is made.
+
+## Phase 06 renderer evidence
+
+Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346e4d247a0783738`, status `PINNED`. The baseline architecture guide identifies a worker-owned graph runtime, but no runnable pinned renderer adapter is present. `tests/fixtures/parity/render/stale-child-patch.scenario.json` exercises the independently authored revision-aware store through an explicit test double and reports `compatible: false`; no L5 claim is made.

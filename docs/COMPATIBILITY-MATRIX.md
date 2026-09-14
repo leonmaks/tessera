@@ -39,3 +39,7 @@ L3 candidate corpus: three properties BDD scenarios, typed-property/class/task/j
 ## Phase 05 status
 
 L4 candidate corpus: Datalog/simple-query/pull contracts, two BDD scenarios and one task-status fixture. The fixture uses an explicit test double; no pinned upstream executable query adapter exists and no L4 compatibility is claimed.
+
+## Phase 06 status
+
+Renderer-subscription candidate corpus: revision/stale-child/duplicate-publication contracts, two BDD scenarios, one 100-run revision-order property check, and a stale-child fixture. The reference is an explicit test double; no pinned executable worker adapter is available and no L5 compatibility is claimed.
