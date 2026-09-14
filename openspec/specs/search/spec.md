@@ -38,3 +38,11 @@ Rebuilding an index from authoritative graph state SHALL produce query results e
 - **GIVEN** an authoritative graph produced by a sequence of committed changes
 - **WHEN** one search index is built incrementally and another is rebuilt from current graph state
 - **THEN** equivalent search requests SHALL produce equivalent normalized results
+
+### Requirement: Keyword results have deterministic ordering
+Keyword search SHALL order equal-score matches by UUID and enforce an explicit result limit.
+
+#### Scenario: Equal keyword matches
+- **GIVEN** two indexed blocks match a keyword equally
+- **WHEN** the keyword query runs
+- **THEN** results SHALL be ordered by UUID and bounded by its limit
