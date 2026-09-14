@@ -25,4 +25,4 @@ Pinned executable upstream graph-provider integration is `UNAVAILABLE`: this rep
 
 ## Closure status
 
-All implementation and verification tasks are complete. The archive task remains open because `openspec/config.yaml` requires parity evidence and fixtures to be committed first; the worktree contains the uncommitted Phase 00 archival/spec synchronization work as well as this Phase 01 implementation. No commit is created automatically. After review and a scoped commit, sync the Phase 01 deltas and archive the change. The next implementation phase after closure is Phase 02 — Outliner core.
+The implementation and parity evidence were committed as `91bbcec`. The three delta specs were merged into the main contracts and `pnpm exec openspec validate --specs` passed for all 15 capabilities. This change is archived at `openspec/changes/archive/2026-09-14-phase-01-transaction-engine` with all 12 tasks complete. The next implementation phase is Phase 02 — Outliner core.

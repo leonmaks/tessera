@@ -17,4 +17,4 @@
 - [x] 3.1 Add fast-check transaction-sequence invariants for atomicity, monotonic revision, UUID uniqueness and replay idempotency; verify with `pnpm test:property`.
 - [x] 3.2 Add deterministic Phase 01 parity fixtures and execute them against the candidate and any available pinned upstream reference adapter; record an explicit `UNAVAILABLE` deviation only if the reference adapter cannot execute; verify with `pnpm test:parity`.
 - [x] 3.3 Run Phase 01 exits and full verification; verify with `pnpm check:specs`, `pnpm check:boundaries`, `pnpm exec vitest run tests/unit/transaction-engine.test.ts tests/unit/graph-db-recovery.test.ts`, `pnpm test:property`, and `pnpm verify`.
-- [ ] 3.4 Sync/archive only after all exit criteria, committed parity evidence and regression fixtures; verify with `pnpm exec openspec validate phase-01-transaction-engine --strict` and `pnpm exec openspec archive phase-01-transaction-engine --yes`.
+- [x] 3.4 Synced all three delta specs after validating the main specs, archived after commit `91bbcec` contained parity evidence and fixtures, and verified with `pnpm exec openspec validate --specs`.
