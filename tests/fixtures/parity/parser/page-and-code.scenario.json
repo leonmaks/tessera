@@ -1,0 +1,7 @@
+{
+  "id": "parser-page-and-code",
+  "description": "Semantic page reference is retained while code literal is excluded",
+  "commands": [
+    { "op": "updateBlock", "target": "parser-fixture", "content": "- [[Architecture]] `[[Not a page]]`" }
+  ]
+}

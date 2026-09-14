@@ -27,3 +27,7 @@ L0 candidate corpus: one deterministic transaction fixture and 11 transaction/re
 ## Phase 02 status
 
 L1 candidate corpus: seven executable outliner BDD scenarios, four focused semantic-command contracts, one 30-run fast-check structural-sequence invariant, and two validated structural fixtures. The fixture reference is a declared test double and reports `compatible: false`; there is no runnable pinned upstream graph adapter. No L1 upstream compatibility is claimed. The only deliberate bounded difference is storage behavior: deleted blocks are tombstoned internally and omitted from the live outliner snapshot, enabling grouped undo without exposing a deleted anchor.
+
+## Phase 03 status
+
+L2 candidate corpus: three parser/reference BDD scenarios, four parser/reference contracts, one 100-run code-isolation property check, and one parser fixture. Its reference is an explicit test double; no runnable pinned upstream parser adapter is available and no L2 compatibility is claimed.
