@@ -1,0 +1,4 @@
+import { expect, it } from "vitest";
+import { createSearchIndex } from "../../packages/search/src/index.js";
+import { projectGraph } from "../../packages/graph-projection/src/index.js";
+it("rebuild equals incremental search and projection respects caps", () => { const docs = [{ uuid: "b", text: "hello graph" }, { uuid: "a", text: "hello world" }]; const index = createSearchIndex(); docs.forEach(doc => index.upsert(doc)); expect(index.search("hello")).toEqual([{ uuid: "a", score: 1 }, { uuid: "b", score: 1 }]); const rebuilt = createSearchIndex(); rebuilt.rebuild(docs); expect(rebuilt.search("hello")).toEqual(index.search("hello")); expect(projectGraph("a", [{ from: "a", to: "b" }, { from: "a", to: "c" }], { maxNodes: 2, maxEdges: 1 })).toEqual({ nodes: ["a", "b"], edges: [{ from: "a", to: "b" }] }); });

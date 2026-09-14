@@ -1,2 +1,5 @@
-// Public entry point for @logseq-ts/search.
-export {};
+export interface SearchDocument { readonly uuid: string; readonly text: string; }
+export interface SearchResult { readonly uuid: string; readonly score: number; }
+export interface SearchIndex { upsert(document: SearchDocument): void; remove(uuid: string): void; rebuild(documents: readonly SearchDocument[]): void; search(term: string, limit?: number): readonly SearchResult[]; }
+export function createSearchIndex(): SearchIndex { let documents = new Map<string, SearchDocument>(); return { upsert(document) { documents.set(document.uuid, Object.freeze({ ...document })); }, remove(uuid) { documents.delete(uuid); }, rebuild(values) { documents = new Map(values.map(value => [value.uuid, Object.freeze({ ...value })])); }, search(term, limit = 100) { if (!Number.isInteger(limit) || limit < 0) throw new Error("Invalid search limit"); const needle = term.trim().toLocaleLowerCase("en-US"); if (!needle) return []; return Object.freeze([...documents.values()].map(document => ({ uuid: document.uuid, score: occurrences(document.text.toLocaleLowerCase("en-US"), needle) })).filter(value => value.score > 0).sort((a, b) => b.score - a.score || a.uuid.localeCompare(b.uuid)).slice(0, limit)); } }; }
+function occurrences(text: string, needle: string): number { let count = 0, position = 0; while ((position = text.indexOf(needle, position)) >= 0) { count++; position += needle.length; } return count; }

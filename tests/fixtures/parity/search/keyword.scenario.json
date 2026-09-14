@@ -1,0 +1,1 @@
+{"id":"search-keyword","description":"Keyword index returns canonical match order","commands":[{"op":"updateBlock","target":"a","content":"hello"}]}

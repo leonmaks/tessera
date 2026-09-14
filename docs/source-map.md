@@ -55,3 +55,7 @@ Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346
 ## Phase 08 import/export evidence
 
 Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346e4d247a0783738`, status `PINNED`. The pinned Markdown syntax guide defines the surface; no runnable upstream import/export adapter is available. `tests/fixtures/parity/import-export/reference-round-trip.scenario.json` uses an explicit test double and reports `compatible: false`.
+
+## Phase 09 search evidence
+
+Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346e4d247a0783738`, status `PINNED`. No runnable upstream search adapter is available. `tests/fixtures/parity/search/keyword.scenario.json` uses an explicit test double and reports `compatible: false`.

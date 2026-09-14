@@ -1,0 +1,2 @@
+import fc from "fast-check"; import { expect, it } from "vitest"; import { createSearchIndex } from "../../packages/search/src/index.js";
+it("search results remain UUID ordered for equal matches", () => { fc.assert(fc.property(fc.uniqueArray(fc.stringMatching(/^[a-z]{1,8}$/)), ids => { const index = createSearchIndex(); ids.forEach(uuid => index.upsert({ uuid, text: "match" })); expect(index.search("match").map(value => value.uuid)).toEqual([...ids].sort()); }), { numRuns: 50 }); });

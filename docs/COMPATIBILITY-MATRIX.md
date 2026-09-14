@@ -51,3 +51,7 @@ L5 candidate corpus: semantic editor-controller contracts, two BDD scenarios, tw
 ## Phase 08 status
 
 L2 candidate corpus: semantic Markdown/Org round-trip and bounds contracts, one BDD scenario, a 50-run property test, and a reference fixture. The reference is an explicit test double; no pinned executable import/export adapter is available and no upstream compatibility is claimed.
+
+## Phase 09 status
+
+L8 candidate corpus: incremental/rebuild keyword contracts, bounded graph projection, a 50-run ordering property, one BDD scenario and keyword fixture. The reference is an explicit test double; no upstream compatibility is claimed.
