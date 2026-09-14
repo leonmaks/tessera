@@ -51,3 +51,7 @@ Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346
 ## Phase 07 editor evidence
 
 Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346e4d247a0783738`, status `PINNED`. No runnable upstream browser editor adapter is available. `tests/fixtures/parity/editor/enter-split.scenario.json` runs the independently authored semantic-intent controller against an explicit test double, reports `compatible: false`, and makes no L5 claim.
+
+## Phase 08 import/export evidence
+
+Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346e4d247a0783738`, status `PINNED`. The pinned Markdown syntax guide defines the surface; no runnable upstream import/export adapter is available. `tests/fixtures/parity/import-export/reference-round-trip.scenario.json` uses an explicit test double and reports `compatible: false`.

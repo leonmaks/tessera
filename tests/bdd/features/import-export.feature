@@ -1,5 +1,5 @@
 @phase-08
-Feature: Semantic import/export
+Feature: Semantic import and export
 
   Scenario: Reference survives Markdown round trip
     Given a graph block "B" contains a reference to page "Architecture"

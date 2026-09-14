@@ -56,6 +56,8 @@ importers:
 
   packages/domain: {}
 
+  packages/editor-ui: {}
+
   packages/graph-client: {}
 
   packages/graph-db:
@@ -69,7 +71,11 @@ importers:
 
   packages/graph-worker: {}
 
-  packages/import-export: {}
+  packages/import-export:
+    dependencies:
+      '@logseq-ts/parser':
+        specifier: workspace:*
+        version: link:../parser
 
   packages/journals: {}
 

@@ -1,0 +1,1 @@
+{"id":"import-export-reference-round-trip","description":"Markdown page reference survives normalized round trip","commands":[{"op":"updateBlock","target":"block","content":"[[Architecture]]"}]}

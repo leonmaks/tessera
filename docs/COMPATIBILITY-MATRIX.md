@@ -47,3 +47,7 @@ Renderer-subscription candidate corpus: revision/stale-child/duplicate-publicati
 ## Phase 07 status
 
 L5 candidate corpus: semantic editor-controller contracts, two BDD scenarios, two real Playwright browser scenarios, and an Enter-to-split fixture. The reference is an explicit test double; no pinned executable editor adapter is available and no L5 upstream compatibility is claimed.
+
+## Phase 08 status
+
+L2 candidate corpus: semantic Markdown/Org round-trip and bounds contracts, one BDD scenario, a 50-run property test, and a reference fixture. The reference is an explicit test double; no pinned executable import/export adapter is available and no upstream compatibility is claimed.

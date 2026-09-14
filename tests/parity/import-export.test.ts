@@ -1,0 +1,11 @@
+import { readFileSync } from "node:fs";
+import { expect, it } from "vitest";
+import { createImportExport } from "../../packages/import-export/src/index.js";
+import { runParity } from "../../packages/compatibility-oracle/src/index.js";
+import type { CompatibilityScenario, ParityProvider, ReferenceProvider } from "../../packages/compatibility-oracle/src/index.js";
+import { baseline, sha } from "../support/harness.js";
+const scenario = JSON.parse(readFileSync(new URL("../fixtures/parity/import-export/reference-round-trip.scenario.json", import.meta.url), "utf8")) as CompatibilityScenario;
+const snapshot = { graphLabel: scenario.id, nodes: [{ uuid: "00000000-0000-4000-8000-000000000801", kind: "page-ref", content: "Architecture", tags: [], refs: [], properties: {} }] };
+const candidate: ParityProvider = { name: "phase08-import-export-candidate", async execute() { const io = createImportExport(); const document = io.importMarkdown("- [[Architecture]]"); return io.importMarkdown(io.exportMarkdown(document)).blocks[0]!.inline.some(node => node.kind === "page-ref") ? snapshot : { ...snapshot, nodes: [] }; } };
+const reference: ReferenceProvider = { name: "phase08-fixture-test-double", baselineCommit: sha, evidence: "test-double", async execute() { return snapshot; } };
+it("keeps Phase 08 import/export provenance explicit", async () => { await expect(runParity(baseline, scenario, candidate, reference)).resolves.toMatchObject({ equal: true, compatible: false }); });
