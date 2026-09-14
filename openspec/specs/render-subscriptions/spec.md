@@ -24,8 +24,18 @@ Each delta SHALL include graph identity and authoritative revision.
 ### Requirement: Blocks are complete replacements
 Changed blocks in a render delta SHALL be complete immutable replacements for the subscribed block projection, not partial mutable objects.
 
+#### Scenario: Changed subscribed block
+- **GIVEN** a subscribed block projection
+- **WHEN** a committed block change is published
+- **THEN** the delta SHALL provide its complete immutable replacement
+
 ### Requirement: Deletions are tombstones
 Deleted blocks SHALL be represented explicitly so caches can remove them.
+
+#### Scenario: Deleted cached block
+- **GIVEN** a cached block
+- **WHEN** a delta reports its deletion
+- **THEN** an explicit tombstone SHALL identify it for cache removal
 
 ### Requirement: Child membership patch is base-revision aware
 A child patch SHALL declare the base revision it expects.

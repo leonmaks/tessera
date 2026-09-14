@@ -45,7 +45,14 @@ importers:
 
   packages/graph-client: {}
 
-  packages/graph-db: {}
+  packages/graph-db:
+    dependencies:
+      '@logseq-ts/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@logseq-ts/platform':
+        specifier: workspace:*
+        version: link:../platform
 
   packages/graph-worker: {}
 

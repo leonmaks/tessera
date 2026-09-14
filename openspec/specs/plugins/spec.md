@@ -17,6 +17,11 @@ Plugins SHALL mutate graph data through Editor/domain capability APIs, not raw S
 ### Requirement: DB query APIs are available
 The targeted facade SHALL include simple query, custom query and Datalog-compatible query calls.
 
+#### Scenario: Targeted query calls
+- **GIVEN** a plugin using the targeted facade
+- **WHEN** it invokes a supported simple, custom or Datalog query
+- **THEN** the corresponding query capability SHALL be available
+
 ### Requirement: Change events include transaction context
 A graph change event SHALL provide changed entities plus transaction data/metadata sufficient for a plugin to react once to a semantic operation.
 
@@ -28,5 +33,15 @@ A graph change event SHALL provide changed entities plus transaction data/metada
 ### Requirement: Commands are registrable
 Plugins SHALL be able to register executable commands and targeted placements supported by the compatibility level.
 
+#### Scenario: Registered command
+- **GIVEN** a plugin command registered at a supported placement
+- **WHEN** that command is invoked
+- **THEN** its registered executable action SHALL run
+
 ### Requirement: Plugin failures are isolated
 An exception in a plugin event handler SHALL NOT corrupt or roll back an already committed graph transaction.
+
+#### Scenario: Handler throws after commit
+- **GIVEN** a committed graph transaction
+- **WHEN** a plugin event handler throws
+- **THEN** the transaction SHALL remain committed and uncorrupted

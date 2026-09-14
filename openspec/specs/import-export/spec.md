@@ -9,6 +9,11 @@ Define Markdown/Org compatibility and semantic round trips.
 ### Requirement: Import materializes semantic graph data
 Import SHALL parse hierarchy, references, tags, properties, tasks and supported assets into graph semantics.
 
+#### Scenario: Supported semantic import
+- **GIVEN** input containing supported hierarchy, references, tags, properties, tasks and assets
+- **WHEN** the input is imported
+- **THEN** those supported features SHALL be materialized in graph semantics
+
 ### Requirement: Export preserves graph semantics
 Export SHALL serialize supported graph semantics using the Logseq-compatible textual representation for the selected profile.
 
@@ -27,3 +32,8 @@ For supported features, export followed by import SHALL preserve the normalized 
 
 ### Requirement: Large/deep input is bounded
 Import SHALL protect runtime memory/stack from deeply nested or massive inputs while preserving deterministic failure/reporting.
+
+#### Scenario: Input exceeds supported resource bounds
+- **GIVEN** deeply nested or massive input exceeding supported resource bounds
+- **WHEN** import is attempted
+- **THEN** failure and reporting SHALL be deterministic within the protected memory and stack bounds

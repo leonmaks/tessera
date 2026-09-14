@@ -17,3 +17,11 @@ Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346
 `tests/parity/harness.test.ts` exercises independently authored synthetic providers and `tests/fixtures/parity/harness/canonical.json`. These are harness contract checks, not upstream behavioral parity. There is no local upstream checkout. An attempt to inspect `libs/src/LSPlugin.ts` at the pinned SHA through the web reader failed to fetch; no upstream source behavior was inferred from that attempt. The earlier TBD rows remain unverified and must be resolved during their behavioral phases.
 
 Repository integration evidence: the installed Cucumber 13.2.1 loader (`lib/configuration/from_file.js`) reads an ESM default export as the default profile. The bootstrap's nested default object discovered zero scenarios. `tests/unit/bdd-config.test.ts` permanently reproduces detection through the real configuration API; after correction seven Phase 00 scenarios execute.
+
+## Phase 01 transaction evidence
+
+Baseline inspected: `upstream/baseline.json`, commit `be800f171172c259d4dd942346e4d247a0783738`, status `PINNED`. GitHub's release listing identifies `be800f1` as a verified upstream commit; the upstream README documents the DB version as DB graphs. Phase 01 uses this bounded evidence, the DB-first authority contract in `docs/ARCHITECTURE.md`, and independently authored tests in `tests/unit/{transaction-engine,graph-pull,graph-db-migrations,graph-db-recovery,post-commit-listeners}.test.ts`.
+
+The standard-library adapter is qualified against the project's Node floor: the [Node SQLite API](https://nodejs.org/api/sqlite.html) documents `DatabaseSync` as introduced in Node 22.5 and available without the experimental flag from Node 22.13. The local runtime test also opened, wrote and read an in-memory database through `node:sqlite`.
+
+`tests/fixtures/parity/transaction-engine/create-entity.scenario.json` is executed against the TypeScript SQLite candidate. Its reference is explicitly `test-double`; it establishes normalizer and candidate fixture behavior only. Pinned executable upstream adapter: **UNAVAILABLE** — no local upstream checkout or runnable upstream graph harness is present. The report marks `compatible: false`; no L0 upstream parity is claimed.

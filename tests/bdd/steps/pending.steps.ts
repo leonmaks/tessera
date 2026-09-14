@@ -8,6 +8,6 @@ import type { ParityWorld } from "../support/world.js";
  * one catch-all expression is sufficient. Replace it with real public-harness
  * steps when activating a phase.
  */
-Given(/^(?!harness ).+$/, function (this: ParityWorld) {
+Given(/^legacy bootstrap: .+$/, function (this: ParityWorld) {
   return this.requireHarness();
 });

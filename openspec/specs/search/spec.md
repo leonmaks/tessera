@@ -18,8 +18,18 @@ Search indexing SHALL receive added/changed/deleted graph effects after commit.
 ### Requirement: Keyword search remains independently usable
 Semantic/vector capabilities SHALL be optional; keyword search SHALL function without them.
 
+#### Scenario: Keyword-only search
+- **GIVEN** semantic and vector capabilities are unavailable
+- **WHEN** a keyword search is requested
+- **THEN** keyword search SHALL remain functional
+
 ### Requirement: Semantic search is bounded
 Vector candidate retrieval and embedding execution SHALL have explicit resource limits.
+
+#### Scenario: Bounded semantic work
+- **GIVEN** configured limits for vector retrieval and embedding execution
+- **WHEN** semantic search performs those operations
+- **THEN** each operation SHALL respect its explicit resource limits
 
 ### Requirement: Rebuild is equivalent to incremental state
 Rebuilding an index from authoritative graph state SHALL produce query results equivalent to applying the same committed history incrementally.

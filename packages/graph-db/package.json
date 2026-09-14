@@ -5,5 +5,9 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@logseq-ts/domain": "workspace:*",
+    "@logseq-ts/platform": "workspace:*"
   }
 }

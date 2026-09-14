@@ -26,8 +26,23 @@ A batch whose `t-before` differs from current server position SHALL be rejected 
 ### Requirement: Presence is ephemeral
 Presence/editing indicators SHALL NOT become durable graph transactions.
 
+#### Scenario: Presence update
+- **GIVEN** a connected participant
+- **WHEN** its presence or editing indicator changes
+- **THEN** the change SHALL NOT become a durable graph transaction
+
 ### Requirement: Large logical transactions preserve order
 Chunking MAY bound request/apply memory, but SHALL preserve logical order and SHALL report partial success explicitly if full rollback is not possible.
 
+#### Scenario: Partially applied chunks
+- **GIVEN** a chunked logical transaction whose applied prefix cannot be rolled back
+- **WHEN** a later chunk fails
+- **THEN** logical order SHALL be preserved and partial success SHALL be reported explicitly
+
 ### Requirement: Checksum compares normalized logical state
 Checksum diagnostics SHALL be based on stable normalized graph content, not SQLite row order.
+
+#### Scenario: Different physical row order
+- **GIVEN** two stores with equal normalized logical content and different SQLite row order
+- **WHEN** their diagnostic checksums are computed
+- **THEN** the checksums SHALL be equal

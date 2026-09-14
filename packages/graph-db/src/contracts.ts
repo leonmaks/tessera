@@ -1,36 +1,38 @@
-import type {
-  EntityId,
-  OperationId,
-  Revision,
-  TransactionId,
-  UUID
-} from "@logseq-ts/domain";
+import type { Clock, UUIDGenerator } from "@logseq-ts/platform";
+import type { GraphValue, OperationId, TransactionInput, TransactionSource, UUID } from "@logseq-ts/domain";
 
 export interface Datom {
-  readonly e: EntityId;
-  readonly a: string;
-  readonly v: unknown;
-  readonly tx: TransactionId;
+  readonly entity: UUID;
+  readonly attribute: string;
+  readonly value: GraphValue;
+  readonly txId: number;
   readonly added: boolean;
 }
 
 export interface TxReport {
-  readonly txId: TransactionId;
+  readonly txId: number;
   readonly operationId: OperationId;
-  readonly revision: Revision;
+  readonly revision: number;
   readonly datoms: readonly Datom[];
 }
 
+export type PullResult =
+  | { readonly status: "absent"; readonly uuid: UUID }
+  | { readonly status: "found"; readonly entity: { readonly uuid: UUID; readonly attributes: Readonly<Record<string, readonly GraphValue[]>> } };
+
+export interface ListenerFailure { readonly operationId: OperationId; readonly listenerIndex: number; readonly message: string; }
+export interface GraphMigration { readonly version: number; readonly name: string; apply(): void; }
+export interface GraphDatabaseOptions { readonly path: string; readonly clock: Clock; readonly uuid: UUIDGenerator; }
+
 export interface GraphDatabase {
-  readonly revision: Revision;
-  transact(input: TransactionInput): Promise<TxReport>;
-  pull(pattern: unknown, entity: UUID | EntityId): Promise<unknown>;
-  query(query: unknown, inputs?: readonly unknown[]): Promise<unknown>;
+  readonly revision: number;
+  readonly schemaVersion: number;
+  readonly listenerFailures: readonly ListenerFailure[];
+  transact(input: unknown): Promise<TxReport>;
+  pull(pattern: unknown, entity: unknown): Promise<PullResult>;
+  subscribePostCommit(listener: (report: TxReport) => void | Promise<void>): () => void;
+  applyMigrations(migrations: readonly GraphMigration[]): void;
+  close(): Promise<void>;
 }
 
-export interface TransactionInput {
-  readonly operationId: OperationId;
-  readonly source: "editor" | "plugin" | "sync" | "cli" | "import" | "system";
-  readonly assertions: readonly unknown[];
-  readonly metadata?: Readonly<Record<string, unknown>>;
-}
+export type { TransactionInput, TransactionSource };

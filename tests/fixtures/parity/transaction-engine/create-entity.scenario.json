@@ -1,0 +1,7 @@
+{
+  "id": "transaction-create-entity",
+  "description": "Phase 01 candidate transaction fixture; reference is a declared test double until an upstream adapter exists.",
+  "commands": [
+    { "op": "createPage", "name": "Database page", "as": "page" }
+  ]
+}

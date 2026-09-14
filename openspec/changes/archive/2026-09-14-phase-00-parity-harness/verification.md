@@ -15,4 +15,12 @@ Final checks: `pnpm check:specs` passed (14 baseline capabilities); `pnpm check:
 
 The existing pinned baseline was inspected; `pnpm codex:next` ran successfully after a sandbox registry-access failure. No upstream implementation was copied or translated. The pinned upstream source request failed, and no source-backed Logseq parity is claimed. See `docs/source-map.md` and `docs/COMPATIBILITY-MATRIX.md`.
 
-The workspace is not a Git repository (`git status --short` fails). `openspec/config.yaml` says to archive only after parity evidence and fixtures are committed. Sync/archive remains pending this prerequisite. No Git repository was initialized and no commit was fabricated. Phase 01 — Graph model and transaction engine is next after Phase 00 closure; it has not been started.
+At the first implementation handoff, the workspace had no Git repository. On continuation, commit `c8106b2` contained the implementation, parity fixture and evidence, and the working tree was clean. This satisfies the archive prerequisite in `openspec/config.yaml`.
+
+Archive preflight exposed 23 baseline requirements without scenarios across eight specs. Added Given/When/Then examples of their existing statements, without changing those statements or claiming implementation of later phases. This corrects OpenSpec document validation; it is not new feature behavior. Phase 01 — Graph model and transaction engine has not been started.
+
+## Closure — 2026-09-14
+
+Synced both delta specs and verified every added requirement against the resulting main specs. `pnpm exec openspec validate --specs`: 15 passed, zero failed (three existing advisory warnings remain). `pnpm verify`: 31 tests passed, including spec/boundary checks and strict typecheck. `pnpm test:parity`: 18 passed. `pnpm test:bdd --tags '@phase00'`: seven scenarios and 17 steps passed.
+
+Archived to `openspec/changes/archive/2026-09-14-phase-00-parity-harness` with all seven tasks complete. The original evidence/fixture commit prerequisite is satisfied by `c8106b2`; closure documentation and spec synchronization are uncommitted working-tree changes. Phase 00 is closed. The next phase is Phase 01 — Graph model and transaction engine.
