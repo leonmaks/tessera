@@ -1,0 +1,17 @@
+{
+  "id": "outliner-structural-commands",
+  "description": "Exercise indent, outdent, split, merge, multi-move and delete",
+  "commands": [
+    { "op": "createPage", "name": "P", "as": "P" },
+    { "op": "createPage", "name": "D", "as": "D" },
+    { "op": "insertBlock", "target": "$P", "position": "last-child", "content": "A", "as": "A" },
+    { "op": "insertBlock", "target": "$P", "position": "last-child", "content": "B", "as": "B" },
+    { "op": "insertBlock", "target": "$P", "position": "last-child", "content": "C", "as": "C" },
+    { "op": "indentBlocks", "targets": ["$B"] },
+    { "op": "outdentBlocks", "targets": ["$B"] },
+    { "op": "splitBlock", "target": "$B", "offset": 1, "as": "empty" },
+    { "op": "mergeWithPrevious", "target": "$empty" },
+    { "op": "moveBlocks", "targets": ["$A", "$C"], "destination": "$D", "position": "last-child" },
+    { "op": "deleteBlock", "target": "$A" }
+  ]
+}

@@ -20,6 +20,11 @@ export type PullResult =
   | { readonly status: "absent"; readonly uuid: UUID }
   | { readonly status: "found"; readonly entity: { readonly uuid: UUID; readonly attributes: Readonly<Record<string, readonly GraphValue[]>> } };
 
+export interface GraphEntityProjection {
+  readonly uuid: UUID;
+  readonly attributes: Readonly<Record<string, readonly GraphValue[]>>;
+}
+
 export interface ListenerFailure { readonly operationId: OperationId; readonly listenerIndex: number; readonly message: string; }
 export interface GraphMigration { readonly version: number; readonly name: string; apply(): void; }
 export interface GraphDatabaseOptions { readonly path: string; readonly clock: Clock; readonly uuid: UUIDGenerator; }
@@ -30,6 +35,7 @@ export interface GraphDatabase {
   readonly listenerFailures: readonly ListenerFailure[];
   transact(input: unknown): Promise<TxReport>;
   pull(pattern: unknown, entity: unknown): Promise<PullResult>;
+  scan(pattern: unknown): Promise<readonly GraphEntityProjection[]>;
   subscribePostCommit(listener: (report: TxReport) => void | Promise<void>): () => void;
   applyMigrations(migrations: readonly GraphMigration[]): void;
   close(): Promise<void>;

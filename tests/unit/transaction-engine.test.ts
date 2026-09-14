@@ -50,4 +50,13 @@ describe("transaction engine", () => {
     await expect(db.pull(["*"], allocated)).resolves.toMatchObject({ status: "found" });
     await db.close();
   });
+
+  it("replaces a cardinality-one fact and exposes immutable entity scans", async () => {
+    const db = graph();
+    await db.transact(input);
+    await db.transact({ operationId: "00000000-0000-4000-8000-000000000024", source: "editor", assertions: [{ kind: "fact.replace", entity, attribute: ":block/title", value: "Second" }] });
+    await expect(db.pull([":block/title"], entity)).resolves.toMatchObject({ status: "found", entity: { attributes: { ":block/title": ["Second"] } } });
+    await expect(db.scan([":block/title"])).resolves.toEqual([{ uuid: entity, attributes: { ":block/title": ["Second"] } }]);
+    await db.close();
+  });
 });

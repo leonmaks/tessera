@@ -1,7 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 import { asUUID, parseGraphValue, parseTransactionInput, stableJson, stableTransactionFingerprint } from "@logseq-ts/domain";
 import type { GraphValue, TransactionAssertion, TransactionInput, UUID } from "@logseq-ts/domain";
-import type { Datom, GraphDatabase, GraphDatabaseOptions, GraphMigration, ListenerFailure, PullResult, TxReport } from "./contracts.js";
+import type { Datom, GraphDatabase, GraphDatabaseOptions, GraphEntityProjection, GraphMigration, ListenerFailure, PullResult, TxReport } from "./contracts.js";
 
 const baseSchema = `
 CREATE TABLE IF NOT EXISTS graph_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS graph_current_facts_v1 (entity_id INTEGER NOT NULL, a
 CREATE INDEX IF NOT EXISTS graph_datoms_v1_tx ON graph_datoms_v1(tx_id);
 CREATE INDEX IF NOT EXISTS graph_current_facts_v1_entity ON graph_current_facts_v1(entity_id);`;
 
-interface EntityRow { readonly id: number; }
+interface EntityRow { readonly id: number; readonly uuid?: UUID; }
 interface OperationRow { readonly fingerprint: string; readonly report_json: string; }
 interface FactRow { readonly ident: string; readonly value_json: string; }
 
@@ -66,10 +66,14 @@ class SqliteGraphDatabase implements GraphDatabase {
     const requested = parsePattern(pattern);
     const found = this.db.prepare("SELECT id FROM graph_entities_v1 WHERE uuid = ?").get(uuid) as EntityRow | undefined;
     if (!found) return freeze({ status: "absent", uuid });
-    const rows = this.db.prepare("SELECT a.ident, d.value_json FROM graph_current_facts_v1 c JOIN graph_datoms_v1 d ON d.id = c.datom_id JOIN graph_attributes_v1 a ON a.id = c.attribute_id WHERE c.entity_id = ? ORDER BY a.ident ASC, d.value_key ASC").all(found.id) as unknown as FactRow[];
-    const attributes: Record<string, GraphValue[]> = {};
-    for (const row of rows) if (requested.all || requested.names.has(row.ident)) (attributes[row.ident] ??= []).push(parseGraphValue(JSON.parse(row.value_json)));
-    return freeze({ status: "found", entity: { uuid, attributes } });
+    return freeze({ status: "found", entity: this.project(found.id, uuid, requested) });
+  }
+
+  async scan(pattern: unknown): Promise<readonly GraphEntityProjection[]> {
+    this.assertOpen();
+    const requested = parsePattern(pattern);
+    const entities = this.db.prepare("SELECT id, uuid FROM graph_entities_v1 ORDER BY uuid ASC").all() as unknown as EntityRow[];
+    return freeze(entities.map(entity => this.project(entity.id, entity.uuid!, requested)));
   }
 
   subscribePostCommit(listener: (report: TxReport) => void | Promise<void>): () => void { this.listeners.add(listener); return () => this.listeners.delete(listener); }
@@ -125,19 +129,35 @@ class SqliteGraphDatabase implements GraphDatabase {
       if (entityId === undefined) throw new Error(`Entity does not exist: ${assertion.entity}`);
       this.db.prepare("INSERT OR IGNORE INTO graph_attributes_v1 (ident) VALUES (?)").run(assertion.attribute);
       const attributeId = (this.db.prepare("SELECT id FROM graph_attributes_v1 WHERE ident = ?").get(assertion.attribute) as unknown as EntityRow).id;
-      const valueJson = stableJson(assertion.value);
-      const prior = this.db.prepare("SELECT datom_id FROM graph_current_facts_v1 WHERE entity_id = ? AND attribute_id = ? AND value_key = ?").get(entityId, attributeId, valueJson) as { datom_id: number } | undefined;
-      if (assertion.kind === "fact.set" && !prior) {
-        const datomId = Number(this.db.prepare("INSERT INTO graph_datoms_v1 (entity_id, attribute_id, value_json, value_key, tx_id, added) VALUES (?, ?, ?, ?, ?, 1)").run(entityId, attributeId, valueJson, valueJson, txId).lastInsertRowid);
-        this.db.prepare("INSERT INTO graph_current_facts_v1 (entity_id, attribute_id, value_key, datom_id) VALUES (?, ?, ?, ?)").run(entityId, attributeId, valueJson, datomId);
-        datoms.push({ entity: assertion.entity, attribute: assertion.attribute, value: assertion.value, txId, added: true });
-      } else if (assertion.kind === "fact.retract" && prior) {
-        this.db.prepare("INSERT INTO graph_datoms_v1 (entity_id, attribute_id, value_json, value_key, tx_id, added) VALUES (?, ?, ?, ?, ?, 0)").run(entityId, attributeId, valueJson, valueJson, txId);
-        this.db.prepare("DELETE FROM graph_current_facts_v1 WHERE entity_id = ? AND attribute_id = ? AND value_key = ?").run(entityId, attributeId, valueJson);
-        datoms.push({ entity: assertion.entity, attribute: assertion.attribute, value: assertion.value, txId, added: false });
+      if (assertion.kind === "fact.replace") {
+        const priorValues = this.db.prepare("SELECT d.value_json, c.value_key FROM graph_current_facts_v1 c JOIN graph_datoms_v1 d ON d.id = c.datom_id WHERE c.entity_id = ? AND c.attribute_id = ? ORDER BY c.value_key ASC").all(entityId, attributeId) as unknown as { value_json: string; value_key: string }[];
+        for (const prior of priorValues) this.retractFact(entityId, attributeId, assertion.entity, assertion.attribute, parseGraphValue(JSON.parse(prior.value_json)), prior.value_key, txId, datoms);
+        this.setFact(entityId, attributeId, assertion.entity, assertion.attribute, assertion.value, txId, datoms);
+      } else {
+        const valueJson = stableJson(assertion.value);
+        const prior = this.db.prepare("SELECT datom_id FROM graph_current_facts_v1 WHERE entity_id = ? AND attribute_id = ? AND value_key = ?").get(entityId, attributeId, valueJson) as { datom_id: number } | undefined;
+        if (assertion.kind === "fact.set" && !prior) this.setFact(entityId, attributeId, assertion.entity, assertion.attribute, assertion.value, txId, datoms);
+        else if (assertion.kind === "fact.retract" && prior) this.retractFact(entityId, attributeId, assertion.entity, assertion.attribute, assertion.value, valueJson, txId, datoms);
       }
     }
     return datoms;
+  }
+  private project(entityId: number, uuid: UUID, requested: { readonly all: boolean; readonly names: ReadonlySet<string> }): GraphEntityProjection {
+    const rows = this.db.prepare("SELECT a.ident, d.value_json FROM graph_current_facts_v1 c JOIN graph_datoms_v1 d ON d.id = c.datom_id JOIN graph_attributes_v1 a ON a.id = c.attribute_id WHERE c.entity_id = ? ORDER BY a.ident ASC, d.value_key ASC").all(entityId) as unknown as FactRow[];
+    const attributes: Record<string, GraphValue[]> = {};
+    for (const row of rows) if (requested.all || requested.names.has(row.ident)) (attributes[row.ident] ??= []).push(parseGraphValue(JSON.parse(row.value_json)));
+    return { uuid, attributes };
+  }
+  private setFact(entityId: number, attributeId: number, entity: UUID, attribute: string, value: GraphValue, txId: number, datoms: Datom[]): void {
+    const valueJson = stableJson(value);
+    const datomId = Number(this.db.prepare("INSERT INTO graph_datoms_v1 (entity_id, attribute_id, value_json, value_key, tx_id, added) VALUES (?, ?, ?, ?, ?, 1)").run(entityId, attributeId, valueJson, valueJson, txId).lastInsertRowid);
+    this.db.prepare("INSERT INTO graph_current_facts_v1 (entity_id, attribute_id, value_key, datom_id) VALUES (?, ?, ?, ?)").run(entityId, attributeId, valueJson, datomId);
+    datoms.push({ entity, attribute, value, txId, added: true });
+  }
+  private retractFact(entityId: number, attributeId: number, entity: UUID, attribute: string, value: GraphValue, valueKey: string, txId: number, datoms: Datom[]): void {
+    this.db.prepare("INSERT INTO graph_datoms_v1 (entity_id, attribute_id, value_json, value_key, tx_id, added) VALUES (?, ?, ?, ?, ?, 0)").run(entityId, attributeId, stableJson(value), valueKey, txId);
+    this.db.prepare("DELETE FROM graph_current_facts_v1 WHERE entity_id = ? AND attribute_id = ? AND value_key = ?").run(entityId, attributeId, valueKey);
+    datoms.push({ entity, attribute, value, txId, added: false });
   }
   private entityId(uuid: string): number | undefined { return (this.db.prepare("SELECT id FROM graph_entities_v1 WHERE uuid = ?").get(uuid) as EntityRow | undefined)?.id; }
   private meta(key: string): string { return (this.db.prepare("SELECT value FROM graph_meta WHERE key = ?").get(key) as { value: string }).value; }

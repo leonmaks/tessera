@@ -23,3 +23,7 @@ L0–L8 each currently have zero verified upstream parity fixtures. No level is 
 ## Phase 01 status
 
 L0 candidate corpus: one deterministic transaction fixture and 11 transaction/recovery/listener/pull contracts plus one fast-check sequence invariant. The fixture executes against the TypeScript SQLite candidate and a declared test double only. Pinned upstream graph execution is `UNAVAILABLE`; fixture reports set `compatible: false`. No L0 upstream compatibility is claimed.
+
+## Phase 02 status
+
+L1 candidate corpus: seven executable outliner BDD scenarios, four focused semantic-command contracts, one 30-run fast-check structural-sequence invariant, and two validated structural fixtures. The fixture reference is a declared test double and reports `compatible: false`; there is no runnable pinned upstream graph adapter. No L1 upstream compatibility is claimed. The only deliberate bounded difference is storage behavior: deleted blocks are tombstoned internally and omitted from the live outliner snapshot, enabling grouped undo without exposing a deleted anchor.

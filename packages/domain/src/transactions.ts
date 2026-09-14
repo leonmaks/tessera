@@ -5,6 +5,7 @@ export type TransactionSource = "editor" | "plugin" | "sync" | "cli" | "import" 
 export type TransactionAssertion =
   | { readonly kind: "entity.create"; readonly uuid?: UUID }
   | { readonly kind: "fact.set"; readonly entity: UUID; readonly attribute: string; readonly value: GraphValue }
+  | { readonly kind: "fact.replace"; readonly entity: UUID; readonly attribute: string; readonly value: GraphValue }
   | { readonly kind: "fact.retract"; readonly entity: UUID; readonly attribute: string; readonly value: GraphValue };
 
 export interface TransactionInput {
@@ -55,7 +56,7 @@ export function stableJson(value: unknown): string {
 function parseAssertion(value: unknown): TransactionAssertion {
   if (!isRecord(value) || typeof value.kind !== "string") throw new Error("Invalid transaction assertion");
   if (value.kind === "entity.create") return value.uuid === undefined ? { kind: "entity.create" } : { kind: "entity.create", uuid: asUUID(value.uuid) };
-  if ((value.kind === "fact.set" || value.kind === "fact.retract") && typeof value.attribute === "string" && value.attribute.length > 0 && !/\s/.test(value.attribute)) return { kind: value.kind, entity: asUUID(value.entity, "Entity"), attribute: value.attribute, value: parseGraphValue(value.value) };
+  if ((value.kind === "fact.set" || value.kind === "fact.replace" || value.kind === "fact.retract") && typeof value.attribute === "string" && value.attribute.length > 0 && !/\s/.test(value.attribute)) return { kind: value.kind, entity: asUUID(value.entity, "Entity"), attribute: value.attribute, value: parseGraphValue(value.value) };
   throw new Error("Invalid transaction assertion");
 }
 function parseMetadata(value: unknown): Readonly<Record<string, unknown>> { if (!isRecord(value) || !isJson(value)) throw new Error("Transaction metadata must be a JSON object"); return value; }

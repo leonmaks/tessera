@@ -22,6 +22,11 @@ export type ScenarioCommand =
   | { readonly op: "insertBlock"; readonly target: string; readonly position: string; readonly content: string; readonly as?: string }
   | { readonly op: "updateBlock"; readonly target: string; readonly content: string }
   | { readonly op: "moveBlock"; readonly target: string; readonly destination: string; readonly position: string }
+  | { readonly op: "moveBlocks"; readonly targets: readonly string[]; readonly destination: string; readonly position: string }
+  | { readonly op: "indentBlocks"; readonly targets: readonly string[] }
+  | { readonly op: "outdentBlocks"; readonly targets: readonly string[] }
+  | { readonly op: "splitBlock"; readonly target: string; readonly offset: number; readonly as?: string }
+  | { readonly op: "mergeWithPrevious"; readonly target: string }
   | { readonly op: "deleteBlock"; readonly target: string }
   | { readonly op: "setProperty"; readonly target: string; readonly property: string; readonly value: unknown };
 
@@ -62,6 +67,11 @@ export const scenarioSchema = z.strictObject({
     z.strictObject({ op: z.literal("insertBlock"), target: text, position: text, content: z.string(), ...alias }),
     z.strictObject({ op: z.literal("updateBlock"), target: text, content: z.string() }),
     z.strictObject({ op: z.literal("moveBlock"), target: text, destination: text, position: text }),
+    z.strictObject({ op: z.literal("moveBlocks"), targets: z.array(text).min(1), destination: text, position: text }),
+    z.strictObject({ op: z.literal("indentBlocks"), targets: z.array(text).min(1) }),
+    z.strictObject({ op: z.literal("outdentBlocks"), targets: z.array(text).min(1) }),
+    z.strictObject({ op: z.literal("splitBlock"), target: text, offset: z.number().int().nonnegative(), ...alias }),
+    z.strictObject({ op: z.literal("mergeWithPrevious"), target: text }),
     z.strictObject({ op: z.literal("deleteBlock"), target: text }),
     z.strictObject({ op: z.literal("setProperty"), target: text, property: text, value: z.json() })
   ]))
