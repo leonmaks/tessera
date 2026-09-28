@@ -1,5 +1,7 @@
-import { EntityNotFoundError, OutlinerCycleError, asUUID } from "@logseq-ts/domain";
-import type { GraphValue, InsertPosition, UUID } from "@logseq-ts/domain";
+import { EntityNotFoundError, OutlinerCycleError, asUUID } from "@tessera-ts/domain";
+import { createParser } from "@tessera-ts/parser";
+import { extractReferences } from "@tessera-ts/references";
+import type { GraphValue, InsertPosition, UUID } from "@tessera-ts/domain";
 
 const kindAttribute = ":outliner/kind";
 const contentAttribute = ":outliner/content";
@@ -7,7 +9,8 @@ const parentAttribute = ":outliner/parent";
 const pageAttribute = ":outliner/page";
 const orderAttribute = ":outliner/order";
 const deletedAttribute = ":outliner/deleted";
-const outlinerPattern = [kindAttribute, contentAttribute, parentAttribute, pageAttribute, orderAttribute, deletedAttribute];
+export const semanticReferencesAttribute = ":references/semantic-json";
+const outlinerPattern = [kindAttribute, contentAttribute, parentAttribute, pageAttribute, orderAttribute, deletedAttribute, semanticReferencesAttribute];
 
 export interface InsertBlockInput { readonly content: string; readonly position: InsertPosition; }
 export interface SplitBlockInput { readonly uuid: UUID; readonly offset: number; }
@@ -21,12 +24,16 @@ export interface OutlinerPage { readonly uuid: UUID; readonly kind: "page"; read
 export interface OutlinerBlock { readonly uuid: UUID; readonly kind: "block"; readonly content: string; readonly parent: UUID; readonly page: UUID; readonly order: string; }
 export type OutlinerNode = OutlinerPage | OutlinerBlock;
 export interface OutlinerSnapshot {
+  pages(): readonly OutlinerPage[];
   node(uuid: UUID): OutlinerNode | undefined;
   block(uuid: UUID): OutlinerBlock;
   children(parent: UUID): readonly OutlinerBlock[];
   blocks(): readonly OutlinerBlock[];
 }
 export interface OutlinerService {
+  renamePage(uuid: UUID, content: string): Promise<void>;
+  deleteBlocks(uuids: readonly UUID[]): Promise<void>;
+  history(): { canUndo: boolean; canRedo: boolean };
   createPage(content: string): Promise<{ uuid: UUID }>;
   insertBlock(input: InsertBlockInput): Promise<{ uuid: UUID }>;
   updateBlock(uuid: UUID, content: string): Promise<void>;
@@ -60,6 +67,7 @@ class Snapshot implements OutlinerSnapshot {
     Object.freeze(this);
   }
   node(uuid: UUID): OutlinerNode | undefined { return this.visible.get(uuid); }
+  pages(): readonly OutlinerPage[] { return freeze([...this.visible.values()].filter((node): node is OutlinerPage => node.kind === 'page').sort((a, b) => a.content.localeCompare(b.content))); }
   block(uuid: UUID): OutlinerBlock { const node = this.node(uuid); if (!node || node.kind !== "block") throw new EntityNotFoundError(`Live block not found: ${uuid}`); return node; }
   children(parent: UUID): readonly OutlinerBlock[] { return freeze([...this.visible.values()].filter((node): node is OutlinerBlock => node.kind === "block" && node.parent === parent).sort(compareBlocks)); }
   blocks(): readonly OutlinerBlock[] { return freeze([...this.visible.values()].filter((node): node is OutlinerBlock => node.kind === "block").sort((a, b) => a.uuid.localeCompare(b.uuid))); }
@@ -69,6 +77,9 @@ class GraphOutliner implements OutlinerService {
   private readonly undoStack: HistoryEntry[] = [];
   private readonly redoStack: HistoryEntry[] = [];
   constructor(private readonly options: OutlinerOptions) {}
+  history() { return { canUndo: this.undoStack.length > 0, canRedo: this.redoStack.length > 0 }; }
+  async renamePage(uuid: UUID, content: string): Promise<void> { await this.mutate(state => { const page = this.liveNode(state, uuid); if (page.kind !== 'page') throw new Error('Not a page'); page.content = content; }); }
+  async deleteBlocks(uuids: readonly UUID[]): Promise<void> { await this.mutate(state => { const roots = this.roots(state, uuids); const parents = new Set(roots.map(uuid => this.liveBlock(state, uuid).parent)); for (const uuid of roots) for (const node of this.descendants(state, uuid)) node.deleted = true; for (const parent of parents) this.assignChildren(state, parent, this.children(state, parent)); }); }
   async createPage(content: string): Promise<{ uuid: UUID }> { const uuid = this.nextUuid(); await this.mutate(state => { state.set(uuid, { uuid, kind: "page", content, deleted: false }); }); return { uuid }; }
   async insertBlock(input: InsertBlockInput): Promise<{ uuid: UUID }> {
     const uuid = this.nextUuid();
@@ -136,7 +147,20 @@ class GraphOutliner implements OutlinerService {
   private nextUuid(): UUID { return asUUID(this.options.uuid.next()); }
 }
 
-function attributes(node: StoredNode): readonly [string, GraphValue][] { const values: [string, GraphValue][] = [[kindAttribute, node.kind], [contentAttribute, node.content], [deletedAttribute, node.deleted]]; if (node.kind === "block") values.push([parentAttribute, { type: "entity", uuid: required(node.parent, "parent") }], [pageAttribute, { type: "entity", uuid: required(node.page, "page") }], [orderAttribute, required(node.order, "order")]); return values; }
+function attributes(node: StoredNode): readonly [string, GraphValue][] {
+  const values: [string, GraphValue][] = [[kindAttribute, node.kind], [contentAttribute, node.content], [deletedAttribute, node.deleted]];
+  if (node.kind === "block") values.push(
+    [parentAttribute, { type: "entity", uuid: required(node.parent, "parent") }],
+    [pageAttribute, { type: "entity", uuid: required(node.page, "page") }],
+    [orderAttribute, required(node.order, "order")],
+    [semanticReferencesAttribute, semanticReferences(node.content)]
+  );
+  return values;
+}
+function semanticReferences(content: string): string {
+  const block = createParser().parseMarkdown(`- ${content}`).blocks[0];
+  return JSON.stringify(extractReferences(block?.inline ?? []));
+}
 function attributeValue(node: StoredNode, attribute: string): GraphValue | undefined { return new Map(attributes(node)).get(attribute); }
 function reference(values: readonly GraphValue[] | undefined): UUID | undefined { const value = values?.[0]; return typeof value === "object" && value !== null && value.type === "entity" ? value.uuid : undefined; }
 function firstString(values: readonly GraphValue[] | undefined): string | undefined { const value = values?.[0]; return typeof value === "string" ? value : undefined; }

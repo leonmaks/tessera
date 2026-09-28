@@ -1,7 +1,8 @@
 {
-  "name": "@logseq-ts/graph-client",
+  "name": "@tessera-ts/graph-client",
   "version": "0.0.0",
   "private": true,
+  "dependencies": { "@tessera-ts/domain": "workspace:*" },
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

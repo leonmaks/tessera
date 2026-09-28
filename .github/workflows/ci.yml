@@ -18,5 +18,6 @@ jobs:
       - run: pnpm install --frozen-lockfile=false
       - run: pnpm check:specs
       - run: pnpm check:boundaries
+      - run: pnpm check:phase-gate
       - run: pnpm typecheck
       - run: pnpm test

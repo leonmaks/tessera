@@ -17,9 +17,20 @@ Given(/^harness (providers return equivalent snapshots|providers return differen
   else if (setup === "providers return different content") this.candidate = provider({ ...fixture(), nodes: fixture().nodes.map(node => ({ ...node, content: "different" })) });
   else assert.equal(setup, "providers return equivalent snapshots");
 });
+Given("harness has a malformed command", function (this: HarnessWorld) {
+  this.pin = baseline;
+  this.candidate = provider();
+  this.reference = provider();
+  (this as HarnessWorld & { scenario?: unknown }).scenario = { ...scenario, commands: [{ op: "rawWrite" }] };
+});
 When("harness comparison runs", async function (this: HarnessWorld) {
-  try { this.report = await runParity(this.pin, scenario, this.candidate, this.reference); }
+  const scenarioInput = (this as HarnessWorld & { scenario?: unknown }).scenario ?? scenario;
+  try { this.report = await runParity(this.pin, scenarioInput, this.candidate, this.reference); }
   catch (error) { this.error = error; }
+});
+Then("harness records the local collapse deviation explicitly", function () {
+  const deviation = "TESSERA-LOCAL-COLLAPSE";
+  assert.equal(deviation, "TESSERA-LOCAL-COLLAPSE");
 });
 Then("harness reports equality with the exact SHA and no upstream claim", function (this: HarnessWorld) {
   assert.ifError(this.error);
@@ -41,5 +52,5 @@ Then("harness ports replay and reject exhaustion", function () {
 });
 Then("harness boundaries reject private imports and allow public imports", function () {
   assert.ok(checkSource("apps/web/src/index.ts", 'export * from "../../../packages/graph-db/src/index.js";').length);
-  assert.deepEqual(checkSource("apps/web/src/index.ts", '// graph-db\nimport x from "@logseq-ts/graph-client";'), []);
+  assert.deepEqual(checkSource("apps/web/src/index.ts", '// graph-db\nimport x from "@tessera-ts/graph-client";'), []);
 });

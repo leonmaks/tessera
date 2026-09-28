@@ -7,13 +7,18 @@ Define browser/desktop/CLI authority and persistence boundaries.
 ## Requirements
 
 ### Requirement: One active local writer per graph
-Desktop/CLI runtime SHALL prevent two active writer daemons from owning the same graph.
+Desktop/CLI runtime SHALL prevent two active writer daemons from owning the same graph and SHALL recover a stale owner only after its health check fails.
 
 #### Scenario: Second writer attempts startup
 - **GIVEN** a healthy daemon owns graph G
 - **WHEN** another process requests G
 - **THEN** it SHALL connect/reuse the owned runtime or fail safely
 - **AND** SHALL NOT start a second writer
+
+#### Scenario: Stale daemon recovery
+- **GIVEN** persisted ownership points to an unhealthy daemon
+- **WHEN** a new daemon requests graph G
+- **THEN** it SHALL replace the stale owner before accepting mutations
 
 ### Requirement: Browser worker owns browser DB access
 Browser renderer SHALL NOT directly own the authoritative SQLite handle.

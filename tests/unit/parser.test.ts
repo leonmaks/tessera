@@ -15,4 +15,10 @@ describe("semantic Markdown and Org parser", () => {
     const document = createParser().parseOrg("* A\n** B\n#+begin_src text\n[[Not a page]]\n#+end_src");
     expect(document.blocks[0]).toMatchObject({ raw: "A", children: [{ raw: "B", children: [{ inline: [{ kind: "code", value: "[[Not a page]]" }] }] }] });
   });
+
+  it("rejects oversized documents before semantic materialization", () => {
+    const parser = createParser({ maxSourceLength: 16 });
+    expect(() => parser.parseMarkdown("- [[Architecture]] is too long")).toThrow("PARSER_LIMIT source length");
+    expect(() => parser.parseOrg("* [[Architecture]] is too long")).toThrow("PARSER_LIMIT source length");
+  });
 });

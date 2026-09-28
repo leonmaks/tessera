@@ -1,5 +1,5 @@
 {
-  "name": "@logseq-ts/properties",
+  "name": "@tessera-ts/properties",
   "version": "0.0.0",
   "private": true,
   "type": "module",

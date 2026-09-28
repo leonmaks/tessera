@@ -1,9 +1,12 @@
 {
-  "name": "@logseq-ts/graph-worker",
+  "name": "@tessera-ts/graph-worker",
   "version": "0.0.0",
   "private": true,
+  "dependencies": { "@tessera-ts/graph-db": "workspace:*", "@tessera-ts/outliner": "workspace:*", "@tessera-ts/domain": "workspace:*", "@tessera-ts/query-engine": "workspace:*", "zod": "4.6.2" },
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./editor-node": "./src/editor-node.ts",
+    "./portable-page-runtime": "./src/portable-page-runtime.ts"
   }
 }

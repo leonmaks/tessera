@@ -1,6 +1,6 @@
 ## Context
 
-`@logseq-ts/parser` exposes AST type declarations only and `@logseq-ts/references` is empty. Phase 02 already persists immutable block content, but parser/reference services must remain pure domain services: they consume text and UUID-labelled source blocks, and do not mutate SQLite or outliner state.
+`@tessera-ts/parser` exposes AST type declarations only and `@tessera-ts/references` is empty. Phase 02 already persists immutable block content, but parser/reference services must remain pure domain services: they consume text and UUID-labelled source blocks, and do not mutate SQLite or outliner state.
 
 ## Goals / Non-Goals
 
@@ -23,7 +23,7 @@ The document parser scans lines into block indentation/depth records and attache
 
 ### References are derived immutable values
 
-`@logseq-ts/references` takes parsed inline nodes and caller-provided UUID source records; it builds pure extraction, page-index and backlink snapshots. No parser or reference API obtains a graph write port. A later graph-worker derivation can persist these projections in the same logical transaction as a text update.
+`@tessera-ts/references` takes parsed inline nodes and caller-provided UUID source records; it builds pure extraction, page-index and backlink snapshots. No parser or reference API obtains a graph write port. A later graph-worker derivation can persist these projections in the same logical transaction as a text update.
 
 ### Canonical page names are presentation-independent
 

@@ -1,0 +1,4 @@
+import { expect, it } from "vitest"; import { createSyncClient, createSyncServer, normalizedChecksum } from "../../packages/sync-client/src/index.js";
+it("rejects stale batches and client pulls before retry",async()=>{const server=createSyncServer(); await server.batch(0,["a"]); const client=createSyncClient(server); await expect(client.push(["b"])).resolves.toMatchObject({t:2}); expect(server.transactions()).toEqual(["a","b"]);});
+it("keeps presence out of durable transactions",async()=>{const server=createSyncServer(); server.presence("u","block"); expect(server.transactions()).toEqual([]); expect(server.currentPresence()).toEqual([{userId:"u",editingBlockUuid:"block"}]);});
+it("checksums normalized logical content",()=>expect(normalizedChecksum(["b","a"])).toBe(normalizedChecksum(["a","b"])));

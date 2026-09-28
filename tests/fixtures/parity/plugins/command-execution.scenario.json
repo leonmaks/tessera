@@ -1,0 +1,7 @@
+{
+  "id": "plugin-command-execution",
+  "description": "A registered plugin command executes exactly its semantic action",
+  "commands": [
+    { "op": "pluginCommand", "id": "example/run", "args": ["payload"] }
+  ]
+}

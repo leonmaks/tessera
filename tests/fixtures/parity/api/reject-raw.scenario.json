@@ -1,0 +1,1 @@
+{"id":"api-reject-raw","description":"Remote boundary refuses raw datom mutation","commands":[{"op":"pluginCommand","id":"api.rejectRaw","args":[]}]}

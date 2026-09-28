@@ -24,7 +24,10 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@logseq-ts/*": [
+      "@tessera-ts/graph-db/browser-opfs": [
+        "packages/graph-db/src/browser-opfs.ts"
+      ],
+      "@tessera-ts/*": [
         "packages/*/src/index.ts"
       ]
     }

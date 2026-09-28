@@ -1,5 +1,5 @@
 {
-  "name": "@logseq-ts/compatibility-oracle",
+  "name": "@tessera-ts/compatibility-oracle",
   "version": "0.0.0",
   "private": true,
   "type": "module",

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define task state and journal identity behavior.
+Define DB-graph task-state semantics and canonical journal identity behavior.
 
 ## Requirements
 

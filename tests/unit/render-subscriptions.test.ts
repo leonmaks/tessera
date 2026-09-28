@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { createRendererStore } from "../../packages/graph-client/src/index.js";
-import { createGraphWorker } from "../../packages/graph-worker/src/index.js";
+import { createBrowserGraphClient, createRendererStore } from "../../packages/graph-client/src/index.js";
+import { attachBrowserWorkerPort, createGraphWorker } from "../../packages/graph-worker/src/index.js";
 import type { GraphId, GraphNode, OperationId, UUID } from "../../packages/domain/src/index.js";
 import type { RenderDelta } from "../../packages/graph-worker/src/index.js";
 
@@ -43,4 +43,25 @@ describe("revision-aware renderer subscriptions", () => {
     expect(result).toMatchObject({ operationId, revision: 1, result: { ok: true } });
     expect(result).not.toHaveProperty("delta");
   });
+
+  it("applies a browser worker command only through its subscribed delta", async () => {
+    const authorityPort = new LoopbackPort(); const rendererPort = new LoopbackPort(); authorityPort.peer = rendererPort; rendererPort.peer = authorityPort;
+    const worker = createGraphWorker({ execute: async () => ({ operationId, transactionId: 1, revision: 1 as never, result: { ok: true }, delta: delta(1) }), query: async () => ({}) });
+    attachBrowserWorkerPort(worker, authorityPort);
+    const store = createRendererStore(); const changed = vi.fn(); store.subscribe(changed);
+    const client = createBrowserGraphClient(rendererPort, store);
+    const result = await client.execute({ commandId: operationId, graphId, actor: { kind: "user" }, command: { kind: "block.delete", uuid: id } });
+    expect(result).toMatchObject({ operationId, revision: 1, result: { ok: true } });
+    expect(result).not.toHaveProperty("delta");
+    expect(client.snapshot().revision).toBe(1);
+    expect(changed).toHaveBeenCalledTimes(1);
+  });
 });
+
+class LoopbackPort {
+  peer?: LoopbackPort;
+  private readonly listeners = new Set<(event: { readonly data: unknown }) => void>();
+  postMessage(message: unknown): void { queueMicrotask(() => { for (const listener of this.peer?.listeners ?? []) listener({ data: message }); }); }
+  addEventListener(_type: "message", listener: (event: { readonly data: unknown }) => void): void { this.listeners.add(listener); }
+  start(): void {}
+}

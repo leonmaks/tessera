@@ -6,7 +6,7 @@ import type {
   OperationId,
   Revision,
   UUID
-} from "@logseq-ts/domain";
+} from "@tessera-ts/domain";
 
 export type ResourceKey =
   | `block:${string}`

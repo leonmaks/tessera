@@ -1,4 +1,4 @@
-@phase-03
+@phase-03 @parser-references
 Feature: Semantic parser and references
 
   Scenario: Page references are semantic nodes
@@ -14,3 +14,7 @@ Feature: Semantic parser and references
     And parsed source block "00000000-0000-4000-8000-000000000390" contains "`[[Architecture]]`"
     When I project backlinks for page "Architecture"
     Then backlink UUIDs are "00000000-0000-4000-8000-000000000391"
+
+  Scenario: Nested Markdown stays ordered
+    When I parse nested Markdown
+    Then the first parsed block has child "B"

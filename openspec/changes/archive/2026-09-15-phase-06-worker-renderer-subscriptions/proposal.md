@@ -21,4 +21,4 @@
 
 ## Impact
 
-Affected packages are `@logseq-ts/graph-worker` and `@logseq-ts/graph-client`; no persistence migration occurs. The local RPC protocol is additive and can be rolled back by stopping clients from using its adapters. Evidence is pinned baseline `be800f171172c259d4dd942346e4d247a0783738`; executable upstream worker parity remains unavailable, so fixtures state `test-double` provenance.
+Affected packages are `@tessera-ts/graph-worker` and `@tessera-ts/graph-client`; no persistence migration occurs. The local RPC protocol is additive and can be rolled back by stopping clients from using its adapters. Evidence is pinned baseline `be800f171172c259d4dd942346e4d247a0783738`; executable upstream worker parity remains unavailable, so fixtures state `test-double` provenance.

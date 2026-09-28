@@ -1,2 +1,4 @@
-// Public entry point for @logseq-ts/sync-client.
-export {};
+export interface SyncServer { batch(tBefore:number,txs:readonly string[]):Promise<{t:number}|{currentT:number}>; pull(since:number):Promise<{t:number;txs:readonly string[]}>; }
+export function createSyncServer(){let t=0;const txs:string[]=[];const presence=new Map<string,string|undefined>();return {async batch(before:number,items:readonly string[]){if(before!==t)return {currentT:t};txs.push(...items);t+=items.length;return {t};},async pull(since:number){return {t,txs:txs.slice(since)};},presence(userId:string,editingBlockUuid?:string){presence.set(userId,editingBlockUuid);},transactions(){return [...txs];},currentPresence(){return [...presence].map(([userId,editingBlockUuid])=>editingBlockUuid===undefined?{userId}:{userId,editingBlockUuid});}};}
+export function createSyncClient(server:SyncServer){let t=0;return {async push(txs:readonly string[]){let result=await server.batch(t,txs);if("currentT" in result){const pulled=await server.pull(t);t=pulled.t;result=await server.batch(t,txs);}if("currentT" in result)throw new Error("stale retry failed");t=result.t;return result;}};}
+export function normalizedChecksum(values: readonly string[]): string { return values.slice().sort().join("\u001f"); }

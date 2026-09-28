@@ -1,4 +1,4 @@
-import type { CommandEnvelope, Revision } from "@logseq-ts/domain";
+import type { CommandEnvelope, Revision } from "@tessera-ts/domain";
 import type { CommandResult, GraphWorker, RenderDelta } from "./contracts.js";
 
 export interface CommandExecution<T> {

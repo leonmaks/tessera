@@ -1,4 +1,4 @@
-import { createParser, type BlockAst, type InlineNode } from "@logseq-ts/parser";
+import { createParser, type BlockAst, type InlineNode } from "@tessera-ts/parser";
 
 export interface PortableBlock { readonly text: string; readonly inline: readonly InlineNode[]; readonly children: readonly PortableBlock[]; }
 export interface PortableDocument { readonly format: "markdown" | "org"; readonly blocks: readonly PortableBlock[]; readonly assets: readonly string[]; }

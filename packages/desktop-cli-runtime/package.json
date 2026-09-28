@@ -1,0 +1,1 @@
+{"name":"@tessera-ts/desktop-cli-runtime","version":"0.0.0","private":true,"type":"module","exports":{".":"./src/index.ts","./editor-host":"./src/editor-host.ts","./desktop-policy":"./src/desktop-policy.ts"},"dependencies":{"@tessera-ts/domain":"workspace:*","@tessera-ts/graph-worker":"workspace:*","zod":"4.6.2"}}

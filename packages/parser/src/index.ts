@@ -3,9 +3,15 @@ export interface BlockAst { readonly raw: string; readonly inline: readonly Inli
 export interface ParsedProperty { readonly key: string; readonly rawValue: string; }
 export type InlineNode = { readonly kind: "text"; readonly value: string } | { readonly kind: "page-ref"; readonly title: string } | { readonly kind: "block-ref"; readonly uuid: string } | { readonly kind: "tag"; readonly title: string } | { readonly kind: "link"; readonly label: string; readonly url: string } | { readonly kind: "code"; readonly value: string } | { readonly kind: "macro"; readonly name: string; readonly args: readonly string[] } | { readonly kind: "embed"; readonly target: string } | { readonly kind: "timestamp"; readonly raw: string };
 export interface Parser { parseMarkdown(source: string): DocumentAst; parseOrg(source: string): DocumentAst; }
+export interface ParserOptions { readonly maxSourceLength?: number; }
 interface Mutable { readonly raw: string; readonly inline: readonly InlineNode[]; readonly properties: readonly ParsedProperty[]; readonly children: Mutable[]; }
-class SemanticParser implements Parser { parseMarkdown(source: string): DocumentAst { return parseDocument(source, "markdown"); } parseOrg(source: string): DocumentAst { return parseDocument(source, "org"); } }
-function parseDocument(source: string, format: "markdown" | "org"): DocumentAst {
+class SemanticParser implements Parser {
+  constructor(private readonly maxSourceLength: number) {}
+  parseMarkdown(source: string): DocumentAst { return parseDocument(source, "markdown", this.maxSourceLength); }
+  parseOrg(source: string): DocumentAst { return parseDocument(source, "org", this.maxSourceLength); }
+}
+function parseDocument(source: string, format: "markdown" | "org", maxSourceLength: number): DocumentAst {
+  if (source.length > maxSourceLength) throw new Error("PARSER_LIMIT source length");
   const roots: Mutable[] = [], stack: { readonly depth: number; readonly block: Mutable }[] = [], lines = source.replace(/\r\n?/g, "\n").split("\n");
   for (let index = 0; index < lines.length; index++) { const line = lines[index]!;
     if (/^```/.test(line) || /^#\+begin_src\b/i.test(line)) { const close = format === "org" ? /^#\+end_src\b/i : /^```/, body: string[] = []; while (++index < lines.length && !close.test(lines[index]!)) body.push(lines[index]!); append(roots, stack, stack.length ? stack.at(-1)!.depth + 1 : 0, makeBlock(body.join("\n"), [{ kind: "code", value: body.join("\n") }])); continue; }
@@ -27,4 +33,8 @@ export function parseInline(source: string): readonly InlineNode[] { const nodes
 function enclosed(source: string, start: number, open: string, close: string): { readonly value: string; readonly end: number } | undefined { if (!source.startsWith(open, start)) return undefined; const end = source.indexOf(close, start + open.length); return end < 0 ? undefined : { value: source.slice(start + open.length, end), end: end + close.length }; }
 function freezeBlock(node: Mutable): BlockAst { return freeze({ raw: node.raw, inline: node.inline, properties: node.properties, children: node.children.map(freezeBlock) }); }
 function freeze<T>(value: T): T { if (value && typeof value === "object" && !Object.isFrozen(value)) { for (const child of Object.values(value as Record<string, unknown>)) freeze(child); Object.freeze(value); } return value; }
-export function createParser(): Parser { return new SemanticParser(); }
+export function createParser(options: ParserOptions = {}): Parser {
+  const maxSourceLength = options.maxSourceLength ?? 1_000_000;
+  if (!Number.isSafeInteger(maxSourceLength) || maxSourceLength < 1) throw new Error("Invalid parser maxSourceLength");
+  return new SemanticParser(maxSourceLength);
+}

@@ -1,4 +1,6 @@
-import type { ChildMembership, GraphId, GraphNode, Revision, UUID } from "@logseq-ts/domain";
+import type { ChildMembership, GraphId, GraphNode, Revision, UUID } from "@tessera-ts/domain";
+export * from './editor-client.js';
+export * from './browser-client.js';
 
 export interface RenderDeltaInput {
   readonly graphId: GraphId;

@@ -1,0 +1,12 @@
+import { build } from 'esbuild';
+import { build as buildWeb } from 'vite';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+const out = 'dist/desktop';
+await mkdir(out, { recursive: true });
+await buildWeb({ configFile: false, root: 'apps/web', build: { outDir: '../../dist/desktop/web', emptyOutDir: true } });
+const shared = { bundle: true, platform: 'node', target: 'node22', format: 'esm', sourcemap: true, external: ['electron'] };
+await build({ ...shared, entryPoints: ['apps/desktop/src/main.ts'], outfile: `${out}/main.mjs` });
+await build({ ...shared, entryPoints: [fileURLToPath(import.meta.resolve('@tessera-ts/graph-worker/editor-node'))], outfile: `${out}/worker.mjs` });
+await build({ ...shared, format: 'cjs', entryPoints: ['apps/desktop/src/preload.ts'], outfile: `${out}/preload.cjs` });
+await writeFile(`${out}/package.json`, JSON.stringify({ name: 'tessera', productName: 'Tessera', version: '0.1.0', type: 'module', main: 'main.mjs' }, null, 2));

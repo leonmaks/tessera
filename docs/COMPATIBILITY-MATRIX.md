@@ -14,6 +14,10 @@
 
 For every row maintain a fixture count, upstream evidence, candidate test suite and known deviations. A known deviation must be explicit; it must never be silently normalized away.
 
+## Current qualification note — 2026-09-15
+
+The local-hosted editor is functional and covered by nine real browser scenarios plus SQLite worker restart tests. It is not a completed L5 compatibility release or proof that all roadmap phases are complete. Test-double fixtures remain explicitly non-upstream. A pinned upstream checkout now exists under ignored `.reference/logseq`; executable differential integration remains an open gate. Historical phase sections below describe candidate progress, not accepted release gates.
+
 ## Phase 00 status
 
 Harness corpus: one synthetic canonical fixture, exercised by `tests/parity/harness.test.ts`; seven executable scenarios in `tests/bdd/features/harness.feature`. Baseline SHA is `be800f171172c259d4dd942346e4d247a0783738`. Reports distinguish test doubles from upstream execution and never claim compatibility for test doubles.
@@ -38,7 +42,7 @@ L3 candidate corpus: three properties BDD scenarios, typed-property/class/task/j
 
 ## Phase 05 status
 
-L4 candidate corpus: Datalog/simple-query/pull contracts, two BDD scenarios and one task-status fixture. The fixture uses an explicit test double; no pinned upstream executable query adapter exists and no L4 compatibility is claimed.
+L4 candidate corpus: Datalog/simple-query/pull contracts and query BDD scenarios. A bounded Datalog predicate over `tests/fixtures/parity/query/basic.edn` now executes against the pinned upstream SQLite/Datascript CLI and matches the candidate result. This is executable evidence for that fixture only; the wider Datalog corpus and browser-versus-Node semantic equivalence are still incomplete, so no full L4 compatibility claim is made.
 
 ## Phase 06 status
 

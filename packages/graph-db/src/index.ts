@@ -1,6 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
-import { asUUID, parseGraphValue, parseTransactionInput, stableJson, stableTransactionFingerprint } from "@logseq-ts/domain";
-import type { GraphValue, TransactionAssertion, TransactionInput, UUID } from "@logseq-ts/domain";
+import { asUUID, parseGraphValue, parseTransactionInput, stableJson, stableTransactionFingerprint } from "@tessera-ts/domain";
+import type { GraphValue, TransactionAssertion, TransactionInput, UUID } from "@tessera-ts/domain";
 import type { Datom, GraphDatabase, GraphDatabaseOptions, GraphEntityProjection, GraphMigration, ListenerFailure, PullResult, TxReport } from "./contracts.js";
 
 const baseSchema = `

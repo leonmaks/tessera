@@ -1,6 +1,6 @@
 ## Context
 
-The SQLite graph database is the only durable mutable graph state after Phase 01. `@logseq-ts/outliner` currently exposes only an interface, while public graph reads can pull one UUID but cannot enumerate a structure. See `proposal.md` for motivation and the main outliner specification for the user-visible contract.
+The SQLite graph database is the only durable mutable graph state after Phase 01. `@tessera-ts/outliner` currently exposes only an interface, while public graph reads can pull one UUID but cannot enumerate a structure. See `proposal.md` for motivation and the main outliner specification for the user-visible contract.
 
 ## Goals / Non-Goals
 
@@ -19,7 +19,7 @@ The SQLite graph database is the only durable mutable graph state after Phase 01
 
 ### Outliner is a semantic service over a narrow graph port
 
-`@logseq-ts/outliner` receives a port with `transact` and a read-only entity scan; it does not import SQLite or manufacture datoms outside the transaction input. The concrete database remains the authority. This keeps the dependency direction ready for a graph-worker adapter in Phase 06, instead of allowing UI state to become a parallel tree.
+`@tessera-ts/outliner` receives a port with `transact` and a read-only entity scan; it does not import SQLite or manufacture datoms outside the transaction input. The concrete database remains the authority. This keeps the dependency direction ready for a graph-worker adapter in Phase 06, instead of allowing UI state to become a parallel tree.
 
 ### Structural state uses cardinality-one facts
 

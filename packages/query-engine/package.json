@@ -1,5 +1,5 @@
 {
-  "name": "@logseq-ts/query-engine",
+  "name": "@tessera-ts/query-engine",
   "version": "0.0.0",
   "private": true,
   "type": "module",

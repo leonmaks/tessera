@@ -1,13 +1,15 @@
 {
-  "name": "@logseq-ts/graph-db",
+  "name": "@tessera-ts/graph-db",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./browser-opfs": "./src/browser-opfs.ts"
   },
   "dependencies": {
-    "@logseq-ts/domain": "workspace:*",
-    "@logseq-ts/platform": "workspace:*"
+    "@sqlite.org/sqlite-wasm": "3.53.4-build1",
+    "@tessera-ts/domain": "workspace:*",
+    "@tessera-ts/platform": "workspace:*"
   }
 }

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define structural editor behavior for blocks.
+Define DB-graph structural editor behavior for ordered blocks, their hierarchy, and semantic edits.
 
 ## Requirements
 

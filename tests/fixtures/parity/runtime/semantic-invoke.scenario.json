@@ -1,0 +1,1 @@
+{"id":"runtime-semantic-invoke","description":"Local runtime delegates semantic command once","commands":[{"op":"pluginCommand","id":"block.delete","args":["block"]}]}

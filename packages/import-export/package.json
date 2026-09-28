@@ -1,10 +1,10 @@
 {
-  "name": "@logseq-ts/import-export",
+  "name": "@tessera-ts/import-export",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@logseq-ts/parser": "workspace:*"
+    "@tessera-ts/parser": "workspace:*"
   },
   "exports": {
     ".": "./src/index.ts"

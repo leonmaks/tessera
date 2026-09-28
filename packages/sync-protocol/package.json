@@ -1,5 +1,5 @@
 {
-  "name": "@logseq-ts/sync-protocol",
+  "name": "@tessera-ts/sync-protocol",
   "version": "0.0.0",
   "private": true,
   "type": "module",

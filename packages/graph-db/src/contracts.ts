@@ -1,5 +1,5 @@
-import type { Clock, UUIDGenerator } from "@logseq-ts/platform";
-import type { GraphValue, OperationId, TransactionInput, TransactionSource, UUID } from "@logseq-ts/domain";
+import type { Clock, UUIDGenerator } from "@tessera-ts/platform";
+import type { GraphValue, OperationId, TransactionInput, TransactionSource, UUID } from "@tessera-ts/domain";
 
 export interface Datom {
   readonly entity: UUID;

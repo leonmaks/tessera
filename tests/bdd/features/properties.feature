@@ -1,4 +1,4 @@
-@phase-04
+@phase-04 @properties @tasks-journals
 Feature: Typed properties and class inheritance
 
   Scenario: Reject invalid typed value

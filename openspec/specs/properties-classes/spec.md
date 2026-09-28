@@ -30,7 +30,7 @@ A cardinality-one property SHALL have at most one effective value; a cardinality
 - **THEN** the change SHALL be rejected unless an explicit loss-resolution policy is supplied
 
 ### Requirement: Tags/classes may define properties
-A class MAY contribute property definitions to tagged nodes.
+Classes that define properties SHALL contribute those definitions to tagged nodes.
 
 #### Scenario: Effective properties
 - **GIVEN** class Person defines `birthday`

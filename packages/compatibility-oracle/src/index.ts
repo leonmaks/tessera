@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export { inspectPinnedUpstream, runPinnedUpstream } from "./upstream-runner.js";
+export type { PinnedUpstream, UpstreamCommandResult } from "./upstream-runner.js";
+
 export interface CanonicalNode {
   readonly uuid: string;
   readonly kind: string;
@@ -28,7 +31,8 @@ export type ScenarioCommand =
   | { readonly op: "splitBlock"; readonly target: string; readonly offset: number; readonly as?: string }
   | { readonly op: "mergeWithPrevious"; readonly target: string }
   | { readonly op: "deleteBlock"; readonly target: string }
-  | { readonly op: "setProperty"; readonly target: string; readonly property: string; readonly value: unknown };
+  | { readonly op: "setProperty"; readonly target: string; readonly property: string; readonly value: unknown }
+  | { readonly op: "pluginCommand"; readonly id: string; readonly args: readonly unknown[] };
 
 export interface CompatibilityScenario {
   readonly id: string;
@@ -73,7 +77,8 @@ export const scenarioSchema = z.strictObject({
     z.strictObject({ op: z.literal("splitBlock"), target: text, offset: z.number().int().nonnegative(), ...alias }),
     z.strictObject({ op: z.literal("mergeWithPrevious"), target: text }),
     z.strictObject({ op: z.literal("deleteBlock"), target: text }),
-    z.strictObject({ op: z.literal("setProperty"), target: text, property: text, value: z.json() })
+    z.strictObject({ op: z.literal("setProperty"), target: text, property: text, value: z.json() }),
+    z.strictObject({ op: z.literal("pluginCommand"), id: text, args: z.array(z.json()) })
   ]))
 });
 

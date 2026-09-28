@@ -20,4 +20,4 @@
 
 ## Impact
 
-Touches `@logseq-ts/import-export` only; it creates portable in-memory documents and does not write raw facts. No schema migration is required. Baseline SHA is `be800f171172c259d4dd942346e4d247a0783738`; upstream execution is unavailable, so parity uses explicit test-double provenance.
+Touches `@tessera-ts/import-export` only; it creates portable in-memory documents and does not write raw facts. No schema migration is required. Baseline SHA is `be800f171172c259d4dd942346e4d247a0783738`; upstream execution is unavailable, so parity uses explicit test-double provenance.

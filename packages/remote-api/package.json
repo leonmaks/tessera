@@ -1,0 +1,1 @@
+{"name":"@tessera-ts/remote-api","version":"0.0.0","private":true,"type":"module","dependencies":{"zod":"4.6.2"},"exports":{".":"./src/index.ts"}}

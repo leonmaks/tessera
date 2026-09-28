@@ -1,4 +1,4 @@
-import type { InlineNode } from "@logseq-ts/parser";
+import type { InlineNode } from "@tessera-ts/parser";
 
 export interface ExtractedReferences { readonly pages: readonly string[]; readonly tags: readonly string[]; readonly blocks: readonly string[]; readonly links: readonly string[]; readonly embeds: readonly string[]; }
 export interface PageDefinition { readonly title: string; readonly aliases?: readonly string[]; }

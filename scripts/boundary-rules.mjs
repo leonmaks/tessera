@@ -9,13 +9,14 @@ export function checkSource(file, source) {
   const violations = new Set();
   const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true);
   const domain = owner === "packages/domain";
-  const forbiddenDb = file.startsWith("apps/") || ["packages/plugin-sdk", "packages/sync-protocol"].includes(owner);
+  const browserAuthorityWorker = /^apps\/web\/src\/[^/]+\.worker\.ts$/.test(file);
+  const forbiddenDb = (file.startsWith("apps/") && !browserAuthorityWorker) || ["packages/plugin-sdk", "packages/sync-protocol"].includes(owner);
   function checkImport(specifier) {
     const target = specifier.startsWith(".") ? posix.normalize(posix.join(posix.dirname(file), specifier)) : specifier;
-    const db = /^@logseq-ts\/graph-db(?:\/|$)/.test(target) || /^packages\/graph-db(?:\/|$)/.test(target);
+    const db = /^@tessera-ts\/graph-db(?:\/|$)/.test(target) || /^packages\/graph-db(?:\/|$)/.test(target);
     if (forbiddenDb && db) violations.add("must not depend on graph-db");
     const targetOwner = target.match(/^(?:packages|apps|services)\/[^/]+/)?.[0];
-    if (/^@logseq-ts\/[^/]+\/src(?:\/|$)/.test(target) || (targetOwner && targetOwner !== owner && target.startsWith(`${targetOwner}/src/`))) {
+    if (/^@tessera-ts\/[^/]+\/src(?:\/|$)/.test(target) || (targetOwner && targetOwner !== owner && target.startsWith(`${targetOwner}/src/`))) {
       violations.add("cross-package private src import");
     }
     if (domain && /^(?:react(?:-dom)?|electron|better-sqlite3|sqlite3|node:sqlite)(?:\/|$)/.test(target)) {

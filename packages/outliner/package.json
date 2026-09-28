@@ -1,7 +1,8 @@
 {
-  "name": "@logseq-ts/outliner",
+  "name": "@tessera-ts/outliner",
   "version": "0.0.0",
   "private": true,
+  "dependencies": { "@tessera-ts/domain": "workspace:*", "@tessera-ts/parser": "workspace:*", "@tessera-ts/references": "workspace:*" },
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

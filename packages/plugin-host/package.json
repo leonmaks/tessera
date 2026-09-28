@@ -1,5 +1,5 @@
 {
-  "name": "@logseq-ts/plugin-host",
+  "name": "@tessera-ts/plugin-host",
   "version": "0.0.0",
   "private": true,
   "type": "module",

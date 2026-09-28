@@ -1,4 +1,4 @@
-@phase-07
+@phase-07 @editor-ui
 Feature: Semantic browser editor
 
   Scenario: Enter creates a semantic split intent
@@ -10,3 +10,13 @@ Feature: Semantic browser editor
     Given an expanded editor block "B" with descendants
     When the editor collapses block "B"
     Then descendants of "B" are hidden without a graph command
+
+  Scenario: Tab applies to the selected block set
+    Given editor blocks "A" and "B" are selected
+    When the editor receives the Tab key
+    Then it sends indent intent for blocks "A,B"
+
+  Scenario: A stale child patch requests an authoritative reload
+    Given an editor with a stale-child reload gateway
+    When the editor receives a stale child patch for "parent"
+    Then it requests a child reload for "parent"

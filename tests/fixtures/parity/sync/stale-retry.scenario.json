@@ -1,0 +1,1 @@
+{"id":"sync-stale-retry","description":"Stale local operation pulls and retries in order","commands":[{"op":"pluginCommand","id":"sync.push","args":["b"]}]}

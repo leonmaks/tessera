@@ -1,0 +1,4 @@
+import assert from "node:assert/strict"; import { Given, When, Then } from "@cucumber/cucumber"; import { createRuntimeRegistry } from "../../../packages/desktop-cli-runtime/src/index.js";
+interface W { runtime?: ReturnType<typeof createRuntimeRegistry>; result?: {reused:boolean}; }
+Given("a healthy graph daemon owns {string}", async function(this:W,g:string){const owners=new Map<string,string>(); this.runtime=createRuntimeRegistry({acquire:async(x,id)=>{if(owners.has(x))return false;owners.set(x,id);return true;},release:async()=>{},healthy:async()=>true}); await this.runtime.start(g,"one");});
+When("another runtime starts {string}",async function(this:W,g:string){this.result=await this.runtime!.start(g,"two");}); Then("it reuses the existing graph daemon",function(this:W){assert.equal(this.result!.reused,true);});

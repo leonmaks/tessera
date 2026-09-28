@@ -1,5 +1,5 @@
 {
-  "name": "@logseq-ts/platform",
+  "name": "@tessera-ts/platform",
   "version": "0.0.0",
   "private": true,
   "type": "module",

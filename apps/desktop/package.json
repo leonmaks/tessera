@@ -1,0 +1,1 @@
+{"name":"@tessera-ts/desktop","version":"0.1.0","private":true,"type":"module","dependencies":{"@tessera-ts/desktop-cli-runtime":"workspace:*","zod":"4.6.2"}}

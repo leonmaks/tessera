@@ -1,6 +1,36 @@
-# Logseq TypeScript Parity — Codex Implementation Package
+# Tessera
 
-This repository is a **specification-first implementation scaffold** for building a TypeScript system that reproduces Logseq behavior without translating the upstream ClojureScript source line-by-line.
+Tessera includes a working local block editor and a specification-first TypeScript implementation project. It is not yet a complete Logseq-compatible application; archived phase artifacts alone are not evidence of product completeness.
+
+## Run the editor
+
+Requires Node.js 22.20+ (tested on Node.js 24) and pnpm.
+
+```powershell
+pnpm install
+pnpm dev:web
+```
+
+Open **http://127.0.0.1:4173**. Keep the server running while editing.
+
+- Create a page using the field at the bottom of the sidebar, then click **Добавить блок**.
+- Type directly into blocks. Changes save automatically; wait for **Все изменения сохранены** before closing.
+- **Enter** splits at the caret; **Shift+Enter** adds a line; **Tab / Shift+Tab** indent/outdent.
+- **Backspace** at the start merges with the previous sibling. **Delete** at the end merges the next sibling. Within text they delete characters normally.
+- Click a bullet to select a block; **Ctrl/Cmd-click** selects several. The selection bar moves or deletes subtrees.
+- Drag a bullet onto another block to move after it; hold **Alt** to nest inside it. The arrow collapses/expands children.
+- Rename the page by editing its title and pressing Enter. Escape cancels. Search finds pages by title or block text. **Markdown** downloads the open page.
+- **Ctrl/Cmd+Z**, **Ctrl/Cmd+Shift+Z**, or toolbar buttons undo/redo operations in the current host session.
+
+The database is **`.tessera/graph.sqlite`**, outside build output. Restarting the server preserves notes but resets undo history. Only one host may open that graph. `TESSERA_GRAPH_PATH` selects a different file. Stop the server before making a filesystem copy of the database. Tests use separate graphs in `.tmp` or the OS temporary directory.
+
+On a failed or conflicting save, the draft stays visible in the open tab. **Повторить сохранение** reloads the authoritative graph and saves your draft over that block's current text. Do not close a tab with an unsaved draft: crash-proof draft recovery is not implemented. Multiple tabs share the graph and host-session undo history.
+
+### Current limits
+
+This is a local-hosted plain-text outliner, not a standalone browser/WASM or packaged Electron application. Rich-text rendering, clickable references/backlinks, import/assets, full query UI, plugin UI and remote collaboration are not integrated into this editor. Markdown download is an outline export, not a full graph interchange/round-trip guarantee. Current parity fixtures include test doubles and do **not** establish executable upstream compatibility.
+
+`pnpm build:web` builds the frontend. To serve that build with its local worker, run `pnpm exec vite preview apps/web --config vite.config.ts --host 127.0.0.1 --port 4173 --strictPort` after stopping the dev server. Opening `dist/index.html` directly cannot provide storage.
 
 ## What is included
 
@@ -71,3 +101,6 @@ A feature is complete only when:
 ## Upstream policy
 
 This project may inspect Logseq to determine behavior and contracts, but implementation code MUST be independently written in TypeScript. Do not paste or transliterate upstream functions. See `docs/UPSTREAM-POLICY.md`.
+# Electron desktop
+
+Run `pnpm dev:desktop` for the native Tessera editor. Build a Windows x64 distribution with `pnpm package:desktop`; launch `dist/releases/Tessera-win32-x64/Tessera.exe`. See [desktop usage and data locations](docs/DESKTOP.md).

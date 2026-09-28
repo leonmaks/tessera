@@ -15,7 +15,7 @@ A transaction batch SHALL include the server position (`t-before`) on which it i
 - **THEN** the server MAY apply it and advance the position
 
 ### Requirement: Stale batch is rejected
-A batch whose `t-before` differs from current server position SHALL be rejected as stale.
+A batch whose `t-before` differs from current server position SHALL be rejected as stale, include the current position, and require client pull/rebase before retry.
 
 #### Scenario: Stale writer
 - **GIVEN** server position is 12
